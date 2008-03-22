@@ -1,6 +1,6 @@
 ;;; adapt-indent.el --- Adapt to foreign indentation offsets
 
-;; Copyright (C) 2007, 2008 Julian Scheid
+;; Copyright (C) 2003, 2007, 2008 Julian Scheid
 
 ;; Author: Julian Scheid <julian@sektor37.de>
 ;; Created: 22 Mar 2008
