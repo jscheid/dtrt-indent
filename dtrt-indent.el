@@ -107,8 +107,8 @@
 ;;   indentation offsets, e.g. files that use varying indentation
 ;;   based on the outer construct.
 ;;
-;; - dtrt-indent currently only supports a limited number of
-;;   languages (major-modes).
+;; - dtrt-indent currently only supports a limited number of languages
+;;   (major-modes).
 ;;
 ;; - dtrt-indent only guesses the indendation offset, not the
 ;;   indentation style.  For instance, it does not detect whether a
@@ -281,15 +281,14 @@ use either \\[customize] or the function `dtrt-indent-mode'."
 (defcustom dtrt-indent-verbosity 1
   "*Verbosity level.
 
-How much dtrt-indent should tell you about what it's
-doing.  If this is 1, the default, dtrt-indent will only
-let you know when it adjusts the indentation offset but will be
-silent otherwise.  By setting this to 2, it will also tell you
-why it didn't adjust the offset.  You might want to try this as a
-first measure if you're unhappy with dtrt-indent's
-actions.  A setting of 3 will output lots of diagnostic
-information.  Finally, a setting of 0 keeps dtrt-indent
-of ever outputting anything."
+How much dtrt-indent should tell you about what it's doing.  If
+this is 1, the default, dtrt-indent will only let you know when
+it adjusts the indentation offset but will be silent otherwise.
+By setting this to 2, it will also tell you why it didn't adjust
+the offset.  You might want to try this as a first measure if
+you're unhappy with dtrt-indent's actions.  A setting of 3 will
+output lots of diagnostic information.  Finally, a setting of 0
+keeps dtrt-indent of ever outputting anything."
   :type '(choice (const :tag "Silent" 0)
                  (const :tag "Normal" 1)
                  (const :tag "Verbose" 2)
@@ -300,13 +299,13 @@ of ever outputting anything."
 (defcustom dtrt-indent-require-confirmation-flag nil
   "*Non-nil means to ask for confirmation before making adjustments.
 
-Whether dtrt-indent asks for confirmation whenever it is
-about to make any adjustments.  By default, adjustments are made
-without your explicit consent because dtrt-indent is
-already quite conservative and tries to 'do the right thing',
-adjustments can be undone easily and they aren't harmful in the
-first place.  However, if you feel like it's doing things behind
-your back, enable this setting."
+Whether dtrt-indent asks for confirmation whenever it is about to
+make any adjustments.  By default, adjustments are made without
+your explicit consent because dtrt-indent is already quite
+conservative and tries to 'do the right thing', adjustments can
+be undone easily and they aren't harmful in the first place.
+However, if you feel like it's doing things behind your back,
+enable this setting."
   :type 'boolean
   :tag "Require Confirmation"
   :group 'dtrt-indent)
@@ -328,14 +327,14 @@ made on a small file - you might want to decrease it."
 (defcustom dtrt-indent-max-relevant-lines 500
   "*Maximum number of relevant lines to be considered in analysis.
 
-This setting is meant to prevent dtrt-indent to spend
-large amounts of time on analyzing large source files.  In
-general, the higher this setting, the more accurate the guess
-will be, but the more time dtrt-indent will consume when
-opening files.  If you have a fast box, you might want to
-consider increasing this number.  On the other hand, if you find
-that dtrt-indent introduces a noticable delay when
-opening files, you might want to decrease it."
+This setting is meant to prevent dtrt-indent to spend large
+amounts of time on analyzing large source files.  In general, the
+higher this setting, the more accurate the guess will be, but the
+more time dtrt-indent will consume when opening files.  If you
+have a fast box, you might want to consider increasing this
+number.  On the other hand, if you find that dtrt-indent
+introduces a noticable delay when opening files, you might want
+to decrease it."
   :type 'integer
   :tag "Maximum Number Of Relevant Lines"
   :group 'dtrt-indent)
@@ -351,8 +350,8 @@ guessed if at least 80% of all lines are indented by an offset
 divisible by 4.
 
 This setting essentially controls how lenient or conservative
-dtrt-indent operates.  If you are getting false positives
-- i.e. guess-offset guesses the wrong offset - you might want to
+dtrt-indent operates.  If you are getting false positives -
+i.e. guess-offset guesses the wrong offset - you might want to
 increase this setting.  On the other hand, if you are getting
 false negatives - i.e. guess-offset refuses to adjust the offset
 - you might want to decrease it."
@@ -366,19 +365,17 @@ false negatives - i.e. guess-offset refuses to adjust the offset
 The percentage (0-100, but higher values than 100 are possible)
 that the number of lines matching the best guess must be higher
 than the number of lines matching the second best guess in order
-for dtrt-indent to adjust the offset.  The default value
-of 100 means that there must be twice as many lines matching the
-best guess than the number of lines matching the second best
-guess.
+for dtrt-indent to adjust the offset.  The default value of 100
+means that there must be twice as many lines matching the best
+guess than the number of lines matching the second best guess.
 
 This check is in place to avoid a good guess to be accepted if
 there is another, similarly good guess, because in that situation
 there is ambiguity and no single reliable guess.  If you are
-getting false positives - i.e. dtrt-indent guesses the
-wrong offset - you might want to increase this setting.  On the
-other hand, if you are getting false negatives -
-i.e. dtrt-indent refuses to adjust the offset - you might
-want to decrease it."
+getting false positives - i.e. dtrt-indent guesses the wrong
+offset - you might want to increase this setting.  On the other
+hand, if you are getting false negatives - i.e. dtrt-indent
+refuses to adjust the offset - you might want to decrease it."
   :type 'float
   :tag "Minimum Superiority Of Best Guess"
   :group 'dtrt-indent)
@@ -394,9 +391,9 @@ to be discarded.
 This setting is in place because without it, in a file with 1000
 lines matching an offset of 4, all of those 1000 lines are also
 matching an offset of 2 and a number of stray lines whose offset
-is divisible by 2 but not by 4 would confuse dtrt-indent
-to treat the smaller offset as the better guess.  By discarding
-the smaller offset with some tolerance, this problem is avoided.
+is divisible by 2 but not by 4 would confuse dtrt-indent to treat
+the smaller offset as the better guess.  By discarding the
+smaller offset with some tolerance, this problem is avoided.
 
 If you notice that often, sub-offsets are wrongly guessed (e.g. 8
 would be the proper offset but 4 is guessed, or 6 would be
@@ -447,8 +444,8 @@ constructs"
 You usually don't want to tinker with this - setting it to a
 higher value than 2 means that the rather common offset of 2 will
 no longer be guessed.  Setting it to 1 will likely screw up
-dtrt-indent algorithms because every line in every source
-code matches that indentation level."
+dtrt-indent algorithms because every line in every source code
+matches that indentation level."
   :type 'integer
   :tag "Minimum Guessed Indentation Offset"
   :group 'dtrt-indent)
@@ -506,8 +503,8 @@ REPLACEMENT."
 END-REGEX is a regular expression matching the end.  If
 SKIP-REGEX matches though, END-REGEX is ignored.
 SYNTAX-REGEX-PAIRS is a list of syntax entries as described for
-`dtrt-indent-language-syntax-table'.  MULTI-LINE, if
-false, constrains the search to the current line."
+`dtrt-indent-language-syntax-table'.  MULTI-LINE, if false,
+constrains the search to the current line."
   (let* ((index-offset 1)
          end-index
          skip-index
@@ -792,10 +789,10 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
 
 (defun dtrt-indent-setup (language-and-variable)
   "Setup dtrt-indent per buffer.
-Configures `dtrt-indent-buffer-language-and-variable' as
-a buffer local variable and sets it to LANGUAGE-AND-VARIABLE,
-where LANGUAGE is the language to use for the buffer and VARIABLE
-is the variable used to configure indentation offset for the
+Configures `dtrt-indent-buffer-language-and-variable' as a buffer
+local variable and sets it to LANGUAGE-AND-VARIABLE, where
+LANGUAGE is the language to use for the buffer and VARIABLE is
+the variable used to configure indentation offset for the
 buffer."
   (set (make-local-variable
         'dtrt-indent-buffer-language-and-variable)
