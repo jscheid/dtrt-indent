@@ -263,31 +263,6 @@ quote, for example.")
     (pascal-mode-hook      pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
 
-;; Consider support for the following languages:
-;; (Project counts from freshmeat.net, 2007-03)
-;;
-;; SQL (533 projects)
-;; Tcl (491 projects)
-;; C# (284 projects)
-;; PL/SQL (93 projects)
-;; Delphi (85 projects)
-;; Fortran (85 projects)
-;; OCaml (76 projects)
-;; Haskell (70 projects)
-;; Ada  (67 projects)
-;; Pascal (62 projects)
-;; Visual Basic (43 projects)
-;; Lua (36 projects)
-;; Eiffel (34 projects)
-;; Smalltalk (30 projects)
-;; ML (30 projects)
-;; Forth (28 projects)
-;; Erlang (23 projects)
-;; Object Pascal (23 projects)
-;; Prolog (21 projects)
-;; Rexx (12 projects)
-;; D (6 projects)
-
 ;;;-----------------------------------------------------------------
 ;;; Customization Definitions:
 
