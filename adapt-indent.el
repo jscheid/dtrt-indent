@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
 
-;; Author: Julian Scheid <julian@sektor37.de>
+;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Created: 22 Mar 2008
 ;; Version: 0.2.0
 ;; Keywords: convenience files languages c
@@ -122,7 +122,6 @@
 ;;
 ;; TODO:
 ;;
-;; - make sure best-guess is only used if not rejected
 ;; - verbose and diagnostics messages
 ;; - make sure variable documentation match their function
 ;; - make sure defaults are sensible
@@ -325,7 +324,6 @@ made on a small file - you might want to decrease it."
   :type 'integer
   :tag "Minimum Number Of Relevant Lines"
   :group 'adapt-indent)
-
 
 (defcustom adapt-indent-max-relevant-lines 500
   "*Maximum number of relevant lines to be considered in analysis.
