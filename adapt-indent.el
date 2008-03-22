@@ -481,6 +481,10 @@ By default, all files are analyzed."
 (make-variable-buffer-local
  'adapt-indent-buffer-language-and-variable)
 
+(defvar adapt-indent-original-indent)
+(make-variable-buffer-local
+ 'adapt-indent-original-indent)
+
 (defun adapt-indent--replace-in-string (haystack
                                         needle-regexp
                                         replacement)
@@ -761,6 +765,10 @@ Buffer hasn't been prepared using adapt-indent-setup"))
                          indent-offset-variable
                          best-indent-offset
                          (buffer-name))))
+        (setq adapt-indent-original-indent
+              (list indent-offset-variable
+                    (eval indent-offset-variable) 
+                    (local-variable-p indent-offset-variable)))
         (set (make-local-variable indent-offset-variable) best-indent-offset)
         (when (>= adapt-indent-verbosity 1)
           (message "Note: %s adjusted to %s%s"
@@ -792,6 +800,28 @@ buffer."
   (set (make-local-variable
         'adapt-indent-buffer-language-and-variable)
        language-and-variable))
+
+(defun adapt-indent-undo ()
+  "Undo any change adapt-indent made to the indentation offset."
+  (interactive)
+  (if (null adapt-indent-original-indent)
+      (message "No adapt-indent override to undo in this buffer")
+    (if (nth 2 adapt-indent-original-indent)
+        (progn
+          (set (nth 0 adapt-indent-original-indent) 
+               (nth 1 adapt-indent-original-indent))
+          (when (>= adapt-indent-verbosity 1)
+            (message "\
+Note: restored original buffer-local value of %d for %s" 
+                     (nth 1 adapt-indent-original-indent) 
+                     (nth 0 adapt-indent-original-indent))))
+      (kill-local-variable (nth 0 adapt-indent-original-indent))
+      (when (>= adapt-indent-verbosity 1)
+        (message "\
+Note: killed buffer-local value for %s, restoring to default %d" 
+                 (nth 1 adapt-indent-original-indent) 
+                 (eval (nth 1 adapt-indent-original-indent)))))
+    (kill-local-variable 'adapt-indent-original-indent)))
 
 ;;-----------------------------------------------------------------
 ;; Diagnostic functions
