@@ -781,13 +781,13 @@ Buffer hasn't been prepared using adapt-indent-setup"))
                          indent-offset-variable
                          best-indent-offset
                          (buffer-name))))
-        (set (make-local-variable indent-offset-variable) guessed-offset)
+        (set (make-local-variable indent-offset-variable) best-indent-offset)
         (when (>= adapt-indent-verbosity 1)
           (message "Note: %s adjusted to %s%s"
                    indent-offset-variable
                    best-indent-offset
                    (if (>= adapt-indent-verbosity 2)
-                       (format " (%.0f%% confidence)" confidence)
+                       (format " (%.0f%% confidence)" (* 100 confidence))
                      "")))
         best-indent-offset))
      (t
