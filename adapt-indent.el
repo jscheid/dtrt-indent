@@ -94,8 +94,7 @@
 ;;
 ;; - Files that specify adapt-indent-mode: 0 as a File Variable.
 ;;
-;; - Files whose full path match one of the Regular Expressions listed
-;;   in adapt-indent-ignored-file-regexps.
+;; - Files for which adapt-indent-accept-file-function returns nil.
 ;;
 ;; - Files with a major mode that adapt-indent doesn't hook into.
 ;;
@@ -157,10 +156,6 @@
 ;; Initial version
 
 ;;; Code:
-(makunbound 'adapt-indent-max-relevant-lines)
-(makunbound 'adapt-indent-language-syntax-table)
-(makunbound 'adapt-indent-hook-mapping-list)
-(makunbound 'adapt-indent-min-superiority)
 
 ;;;###autoload
 (define-minor-mode adapt-indent-mode
@@ -277,7 +272,7 @@ quote, for example.")
   "Toggle adaptive indentation mode.
 Setting this variable directly does not take effect;
 use either \\[customize] or the function `adapt-indent-mode'."
-  :set 'adapt-indent-mode
+  :set #'(lambda (symbol value) (funcall symbol (or value 0)))
   :initialize 'custom-initialize-default
   :version "22.0"
   :type    'boolean
@@ -347,7 +342,7 @@ opening files, you might want to decrease it."
   :tag "Maximum Number Of Relevant Lines"
   :group 'adapt-indent)
 
-(defcustom adapt-indent-min-quality 80
+(defcustom adapt-indent-min-quality 80.0
   "*Minimum quality for an indentation offset to be accepted.
 
 Percentage (0-100) of lines that are indented by a non-zero
@@ -367,7 +362,7 @@ false negatives - i.e. guess-offset refuses to adjust the offset
   :tag "Minimum Number Of Matching Lines"
   :group 'adapt-indent)
 
-(defcustom adapt-indent-min-superiority 100
+(defcustom adapt-indent-min-superiority 100.0
   "*Minimum percentage the best guess needs to be better than second best.
 
 The percentage (0-100, but higher values than 100 are possible)
@@ -390,7 +385,7 @@ want to decrease it."
   :tag "Minimum Superiority Of Best Guess"
   :group 'adapt-indent)
 
-(defcustom adapt-indent-max-merge-deviation 20
+(defcustom adapt-indent-max-merge-deviation 20.0
   "*Minimum difference between offsets divisible without remainder.
 
 The percentage of difference in the number of lines that are
@@ -470,6 +465,18 @@ a higher value than 8 should not be harmful, but source files
 using more than 8 spaces per indentation level are very rare."
   :type 'integer
   :tag "Maximum Guessed Indentation Offset"
+  :group 'adapt-indent)
+
+(defcustom adapt-indent-accept-file-function (lambda (filename) t)
+  "*Acceptor determining which files are analyzed.
+
+This function will be called for every file adapt-indent would
+normally analyze with one argument, the file name.  Only if it
+returns a non-nil value analysis will be performed on the file.
+
+By default, all files are analyzed."
+  :type 'function
+  :tag "Analysed File Inclusion Function"
   :group 'adapt-indent)
 
 (defvar adapt-indent-buffer-language-and-variable)
@@ -773,7 +780,8 @@ Buffer hasn't been prepared using adapt-indent-setup"))
 (defun adapt-indent-find-file-hook ()
   "Try adjusting indentation offset when a file is loaded."
   (when (and adapt-indent-mode
-             adapt-indent-buffer-language-and-variable)
+             adapt-indent-buffer-language-and-variable
+             (funcall adapt-indent-accept-file-function buffer-file-name))
     (adapt-indent-try-set-offset)))
 
 (defun adapt-indent-setup (language-and-variable)
