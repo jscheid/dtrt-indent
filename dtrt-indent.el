@@ -241,20 +241,20 @@ prevent an escaped quote from being interpreted as the closing
 quote, for example.")
 
 (defvar dtrt-indent-hook-mapping-list
-;;   Hook                  Syntax        Variable
-  '((c-mode-hook           c/c++/java    c-basic-offset)       ; C
-    (c++-mode-hook         c/c++/java    c-basic-offset)       ; C++
-    (java-mode-hook        c/c++/java    c-basic-offset)       ; Java
-    (jde-mode-hook         c/c++/java    c-basic-offset)       ; Java (JDE)
-    (javascript-mode-hook  c/c++/java    c-basic-offset)       ; JavaScript
-    (objc-mode-hook        c/c++/java    c-basic-offset)       ; Objective C
-    (php-mode-hook         c/c++/java    c-basic-offset)       ; PHP
-    (perl-mode-hook        perl          perl-indent-level)    ; Perl
+;;   Mode            Hook                  Syntax        Variable
+  '((c-mode          c-mode-hook           c/c++/java    c-basic-offset)       ; C
+    (c++-mode        c++-mode-hook         c/c++/java    c-basic-offset)       ; C++
+    (java-mode       java-mode-hook        c/c++/java    c-basic-offset)       ; Java
+    (jde-mode        jde-mode-hook         c/c++/java    c-basic-offset)       ; Java (JDE)
+    (javascript-mode javascript-mode-hook  c/c++/java    c-basic-offset)       ; JavaScript
+    (objc-mode       objc-mode-hook        c/c++/java    c-basic-offset)       ; Objective C
+    (php-mode        php-mode-hook         c/c++/java    c-basic-offset)       ; PHP
+    (perl-mode       perl-mode-hook        perl          perl-indent-level)    ; Perl
 ;;  (python-mode-hook      python        py-indent-offset)     ; Python
-    (ruby-mode-hook        ruby          ruby-indent-level)    ; Ruby
-    (ada-mode-hook         ada           ada-indent)           ; Ada
-    (sh-mode-hook          shell         sh-basic-offset)      ; Shell Script
-    (pascal-mode-hook      pascal        pascal-indent-level)) ; Pascal
+    (ruby-mode       ruby-mode-hook        ruby          ruby-indent-level)    ; Ruby
+    (ada-mode        ada-mode-hook         ada           ada-indent)           ; Ada
+    (sh-mode         sh-mode-hook          shell         sh-basic-offset)      ; Shell Script
+    (pascal-mode     pascal-mode-hook      pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
 
 ;;;-----------------------------------------------------------------
@@ -310,7 +310,7 @@ enable this setting."
   :tag "Require Confirmation"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-relevant-lines 5
+(defcustom dtrt-indent-min-relevant-lines 2
   "*Minimum number of relevant lines required for a guess to be made.
 
 This check is in place because with a very low number of lines
@@ -359,7 +359,7 @@ false negatives - i.e. guess-offset refuses to adjust the offset
   :tag "Minimum Number Of Matching Lines"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-superiority 100.0
+(defcustom dtrt-indent-min-indent-superiority 100.0
   "*Minimum percentage the best guess needs to be better than second best.
 
 The percentage (0-100, but higher values than 100 are possible)
@@ -378,6 +378,22 @@ hand, if you are getting false negatives - i.e. dtrt-indent
 refuses to adjust the offset - you might want to decrease it."
   :type 'float
   :tag "Minimum Superiority Of Best Guess"
+  :group 'dtrt-indent)
+
+(defcustom dtrt-indent-min-soft-tab-superiority 100.0
+  "*Minimum percentage soft-tab lines need to outnumber hard-tab ones.
+
+TBD"
+  :type 'float
+  :tag "Minimum Superiority Of Soft Tabs"
+  :group 'dtrt-indent)
+
+(defcustom dtrt-indent-min-hard-tab-superiority 100.0
+  "*Minimum percentage hard-tab lines need to outnumber hard-tab ones.
+
+TBD"
+  :type 'float
+  :tag "Minimum Superiority Of Hard Tabs"
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-max-merge-deviation 20.0
@@ -405,7 +421,7 @@ increase it."
   :tag "Maximum Deviation For Sub-Offset Merging"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-ignore-single-chars-flag t
+(defcustom dtrt-indent-ignore-single-chars-flag nil
   "*Non-nil means ignore lines containing only a single character.
 
 Whether to treat lines that contain only a single non-whitespace
@@ -417,7 +433,7 @@ level isn't reliably guessed without those lines."
   :tag "Ignore Single-Character Lines"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-matching-indentations 2
+(defcustom dtrt-indent-min-matching-indentations 1
   "*Minimum number of distinct levels for an offset to be eligible.
 
 The minimum number of distinct, non-zero indentation levels
@@ -527,8 +543,10 @@ constrains the search to the current line."
          (re-search-forward regexp
                             (unless multi-line
                               (save-excursion (end-of-line) (point))) t)
-         (let ((match-index 1))
-           (while (null (match-beginning match-index))
+         (let ((match-index 1)
+               (match-count (/ (length (match-data)) 2)))
+           (while (and (<= match-index match-count)
+                       (null (match-beginning match-index)))
              (setq match-index (1+ match-index)))
            (cond
             ((eq match-index end-index) nil)
@@ -585,7 +603,9 @@ non-whitespace character of the line."
 
 The histogram is calculated for the current buffer using LANGUAGE
 to determine which lines to exclude from the histogram."
-  (let ((histogram (make-hash-table)))
+  (let ((histogram (make-hash-table))
+        (hard-tab-line-count 0)
+        (soft-tab-line-count 0))
 
     (dtrt-indent--for-each-indentation
      language
@@ -600,6 +620,10 @@ to determine which lines to exclude from the histogram."
                   (1+ (gethash (current-column)
                                (car histogram-and-count) 0))
                   (car histogram-and-count))
+         (beginning-of-line)
+         (if (looking-at "[\t]+")
+             (setq hard-tab-line-count (1+ hard-tab-line-count))
+           (setq soft-tab-line-count (1+ soft-tab-line-count)))
          (setcdr histogram-and-count (1+ (cdr histogram-and-count))))
        (< (cdr histogram-and-count)
           dtrt-indent-max-relevant-lines))
@@ -610,7 +634,10 @@ to determine which lines to exclude from the histogram."
                                               (list (list key value))))
                  (setq total-lines (+ total-lines value)))
                histogram)
-      (list histogram-list total-lines))))
+      (list histogram-list
+            total-lines
+            hard-tab-line-count
+            soft-tab-line-count))))
 
 (defun dtrt-indent--analyze-histogram-try-offset (try-offset
                                                    histogram
@@ -678,20 +705,20 @@ TBD"
         (dolist (other-analysis-entry (cdr analysis-iterator))
 
           (let ((deviation (abs (- (nth 1 other-analysis-entry)
-                                    (nth 1 analysis-entry)))))
+                                   (nth 1 analysis-entry)))))
             (when (and (not (nth 3 analysis-entry))
                        (eq 0 (mod (car other-analysis-entry)
                                   (car analysis-entry)))
                        (> dtrt-indent-max-merge-deviation
                           (* 100.0 deviation)))
               (setcdr
-               (cdr (cdr analysis-entry))
+               (cddr analysis-entry)
                (list
                 (format "\
 merged with offset %s (%.2f%% deviation, limit %.2f%%)"
-                 (nth 0 other-analysis-entry)
-                 (* 100.0 deviation)
-                 dtrt-indent-max-merge-deviation)))))))
+                        (nth 0 other-analysis-entry)
+                        (* 100.0 deviation)
+                        dtrt-indent-max-merge-deviation)))))))
       (setq analysis-iterator (cdr analysis-iterator)))
 
     (let* ((best-guess
@@ -709,26 +736,58 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                        (* 2.0 (expt (/ (nth 1 second-best-guess) 2.0) 2))
                      0))
               0))
+           (total-lines (nth 1 histogram-and-total-lines))
+           (hard-tab-percentage (if (> total-lines 0)
+                                    (/ (nth 2 histogram-and-total-lines)
+                                       total-lines)
+                                  0))
+           (soft-tab-percentage (if (> total-lines 0)
+                                    (/ (nth 3 histogram-and-total-lines)
+                                       total-lines)
+                                  0))
+           (change-indent-tabs-mode)
+           (indent-tabs-mode-setting)
            (rejected
             (cond
              ((null best-guess)
               "no best guess")
              ((< (* 100.0 (nth 1 best-guess))
                  dtrt-indent-min-quality)
-              (format "best guess below minimum quality (%f < %f)" (* 100.0 (nth 1 best-guess)) 
+              (format "best guess below minimum quality (%f < %f)" (* 100.0 (nth 1 best-guess))
                       dtrt-indent-min-quality))
              ((and second-best-guess
                    (< (- (/ (* 100.0 (nth 1 best-guess))
                             (nth 1 second-best-guess))
                          100)
-                      dtrt-indent-min-superiority))
+                      dtrt-indent-min-indent-superiority))
               "best guess not much better than second best guess"))))
 
+      (cond
+       ((or (= 0 hard-tab-percentage)
+            (> (/ soft-tab-percentage
+                  hard-tab-percentage)
+               dtrt-indent-min-soft-tab-superiority))
+        (setq change-indent-tabs-mode t)
+        (setq indent-tabs-mode-settings nil))
+
+       ((or (= 0 soft-tab-percentage)
+            (> (/ hard-tab-percentage
+                  soft-tab-percentage)
+               dtrt-indent-min-hard-tab-superiority))
+        (setq change-indent-tabs-mode t)
+        (setq indent-tabs-mode-settings t)))
+
       (list (cons :histogram (car histogram-and-total-lines))
-            (cons :total-lines (nth 1 histogram-and-total-lines))
+            (cons :total-lines total-lines)
             (cons :analysis analysis)
             (cons :best-guess best-guess)
             (cons :second-best-guess second-best-guess)
+            (cons :hard-tab-lines (nth 2 histogram-and-total-lines) )
+            (cons :hard-tab-percentage hard-tab-percentage)
+            (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
+            (cons :soft-tab-percentage soft-tab-percentage)
+            (cons :change-indent-tabs-mode change-indent-tabs-mode)
+            (cons :indent-tabs-mode-settings indent-tabs-mode-settings)
             (cons :rejected rejected)
             (cons :confidence confidence)))))
 
@@ -747,6 +806,10 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
           (cdr (assoc :rejected result)))
          (confidence
           (cdr (assoc :confidence result)))
+         (change-indent-tabs-mode
+          (cdr (assoc :change-indent-tabs-mode result)))
+         (indent-tabs-mode-settings
+          (cdr (assoc :indent-tabs-mode-settings result)))
          (best-indent-offset
           (nth 0 best-guess))
          (indent-offset-variable
@@ -764,16 +827,21 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
                          (buffer-name))))
         (setq dtrt-indent-original-indent
               (list indent-offset-variable
-                    (eval indent-offset-variable) 
+                    (eval indent-offset-variable)
                     (local-variable-p indent-offset-variable)))
         (set (make-local-variable indent-offset-variable) best-indent-offset)
+        (when change-indent-tabs-mode
+          (set (make-local-variable 'indent-tabs-mode) indent-tabs-mode-settings))
         (when (>= dtrt-indent-verbosity 1)
-          (message "Note: %s adjusted to %s%s"
-                   indent-offset-variable
-                   best-indent-offset
-                   (if (>= dtrt-indent-verbosity 2)
-                       (format " (%.0f%% confidence)" (* 100 confidence))
-                     "")))
+          (let ((offset-info (format "%s adjusted to %s%s"
+                                     indent-offset-variable
+                                     best-indent-offset
+                                     (if (>= dtrt-indent-verbosity 2)
+                                         (format " (%.0f%% confidence)" (* 100 confidence))
+                                       "")))
+                (tabs-mode-info (when change-indent-tabs-mode
+                                  (format " and indent-tabs-mode adjusted to %s" indent-tabs-mode-settings))))
+            (message (concat "Note: " offset-info tabs-mode-info))))
         best-indent-offset))
      (t
       (when (>= dtrt-indent-verbosity 2)
@@ -798,6 +866,20 @@ buffer."
         'dtrt-indent-buffer-language-and-variable)
        language-and-variable))
 
+(defun dtrt-indent-adapt ()
+  "Try adjusting indentation settings for the current buffer."
+  (interactive)
+  (if dtrt-indent-original-indent
+      (message "dtrt-indent already adjusted this buffer")
+    (when (not dtrt-indent-buffer-language-and-variable)
+      (let ((mapping-entry (assoc major-mode dtrt-indent-hook-mapping-list)))
+        (if mapping-entry
+            (set (make-local-variable
+                  'dtrt-indent-buffer-language-and-variable)
+                 (cddr mapping-entry))
+          (error "Major mode %s not supported by dtrt-indent" major-mode))))
+    (dtrt-indent-try-set-offset)))
+  
 (defun dtrt-indent-undo ()
   "Undo any change dtrt-indent made to the indentation offset."
   (interactive)
@@ -805,18 +887,18 @@ buffer."
       (message "No dtrt-indent override to undo in this buffer")
     (if (nth 2 dtrt-indent-original-indent)
         (progn
-          (set (nth 0 dtrt-indent-original-indent) 
+          (set (nth 0 dtrt-indent-original-indent)
                (nth 1 dtrt-indent-original-indent))
           (when (>= dtrt-indent-verbosity 1)
             (message "\
-Note: restored original buffer-local value of %d for %s" 
-                     (nth 1 dtrt-indent-original-indent) 
+Note: restored original buffer-local value of %d for %s"
+                     (nth 1 dtrt-indent-original-indent)
                      (nth 0 dtrt-indent-original-indent))))
       (kill-local-variable (nth 0 dtrt-indent-original-indent))
       (when (>= dtrt-indent-verbosity 1)
         (message "\
-Note: killed buffer-local value for %s, restoring to default %d" 
-                 (nth 1 dtrt-indent-original-indent) 
+Note: killed buffer-local value for %s, restoring to default %d"
+                 (nth 1 dtrt-indent-original-indent)
                  (eval (nth 1 dtrt-indent-original-indent)))))
     (kill-local-variable 'dtrt-indent-original-indent)))
 
@@ -826,6 +908,13 @@ Note: killed buffer-local value for %s, restoring to default %d"
 (defun dtrt-indent-diagnosis ()
   "Guess indentation for the current buffer and output diagnostics."
   (interactive)
+  (when (not dtrt-indent-buffer-language-and-variable)
+    (let ((mapping-entry (assoc major-mode dtrt-indent-hook-mapping-list)))
+      (if mapping-entry
+          (set (make-local-variable
+                'dtrt-indent-buffer-language-and-variable)
+               (cddr mapping-entry))
+        (error "Major mode %s not supported by dtrt-indent" major-mode))))
   (require 'benchmark)
   (let* (result
          (time-for-analysis
@@ -833,9 +922,15 @@ Note: killed buffer-local value for %s, restoring to default %d"
             (setq result
                   (dtrt-indent--analyze
                    (dtrt-indent--calc-histogram
-                    (car dtrt-indent-buffer-language-and-variable))))))         
+                    (car dtrt-indent-buffer-language-and-variable))))))
          (histogram (cdr (assoc :histogram result)))
          (total-lines (cdr (assoc :total-lines result)))
+         (hard-tab-lines (cdr (assoc :hard-tab-lines result)))
+         (hard-tab-percentage (cdr (assoc :hard-tab-percentage result)))
+         (soft-tab-lines (cdr (assoc :soft-tab-lines result)))
+         (soft-tab-percentage (cdr (assoc :soft-tab-percentage result)))
+         (change-indent-tabs-mode (cdr (assoc :change-indent-tabs-mode result)))
+         (indent-tabs-mode-settings (cdr (assoc :indent-tabs-mode-settings result)))
          (analysis (cdr (assoc :analysis result)))
          (best-guess (cdr (assoc :best-guess result)))
          (second-best-guess (cdr (assoc :second-best-guess result)))
@@ -856,7 +951,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
            (format "\
 \n\
 Analysis cancelled: not enough relevant lines (%d required) - not \
-modifying offset\n\n"
+modifying offset or indent-tabs-mode\n\n"
                    dtrt-indent-min-relevant-lines))
         (princ "\nHistogram:\n\n")
         (princ
@@ -908,16 +1003,23 @@ required)\n"
 required)\n"
                        (- (/ (* 100.0 (nth 1 best-guess))
                              (nth 1 second-best-guess)) 100)
-                       dtrt-indent-min-superiority)))
+                       dtrt-indent-min-indent-superiority)))
           (princ
            (format "  There is no second best guess\n")))
+
+        (princ (format "  Hard tab percentage: %f (%d lines)\n"
+                       hard-tab-percentage hard-tab-lines))
+        (princ (format "  Soft tab percentage: %f (%d lines)\n"
+                       soft-tab-percentage soft-tab-lines))
 
         (princ "\nConclusion:\n\n")
 
         (princ (format "\
   Guessed offset %s with %.0f%% confidence.\n"
                        (nth 0 best-guess)
-                       (* 100.0 confidence)))))))
+                       (* 100.0 confidence)))
+        (princ (format "  Change indent-tab-setting: %s\n"
+                       (if change-indent-tabs-mode (format "yes, to %s" indent-tabs-mode-settings) "no")))))))
 
 
 ;; The following is from font-lock.el
@@ -958,17 +1060,17 @@ required)\n"
 (eval-when-compile
 
   (defun dtrt-indent-functional-test (args)
-    (with-temp-buffer 
+    (with-temp-buffer
       (make-local-variable 'dtrt-indent-verbosity)
       (setq dtrt-indent-verbosity 0)
       (make-local-variable 'dtrt-indent-min-relevant-lines)
       (setq dtrt-indent-min-relevant-lines 3)
       (insert (cdr (assoc :buffer-contents args)))
       (let ((language-and-variable
-             (cdr (assoc (cdr (assoc :mode-hook args))
-                         dtrt-indent-hook-mapping-list))))
+             (cddr (assoc (cdr (assoc :mode args))
+                          dtrt-indent-hook-mapping-list))))
         (when (not language-and-variable)
-          (error "Unknown mode-hook `%s'" (cdr (assoc :mode-hook args))))
+          (error "Unknown mode `%s'" (cdr (assoc :mode args))))
         (dtrt-indent-setup language-and-variable)
         (let* ((result
                 (dtrt-indent--analyze
@@ -1021,15 +1123,15 @@ required)\n"
            (insert-file-contents-literally file)
            (set (make-local-variable
                  'dtrt-indent-buffer-language-and-variable)
-                (cdr (assoc (cdr (assoc :mode-hook args))
-                            dtrt-indent-hook-mapping-list)))
+                (cddr (assoc (cdr (assoc :mode args))
+                             dtrt-indent-hook-mapping-list)))
            (dtrt-indent-try-adjust)))))))
 
   ;; Functional tests
 
   (dtrt-indent-functional-test
    '((:buffer-contents . "foo")
-     (:mode-hook . sh-mode-hook)
+     (:mode . sh-mode)
      (:expected-offset . nil)))
 
   (dtrt-indent-functional-test
@@ -1037,7 +1139,7 @@ required)\n"
 aa
     aa
         aa")
-     (:mode-hook . sh-mode-hook)
+     (:mode . sh-mode)
      (:expected-offset . 4)))
 
   (dtrt-indent-functional-test
@@ -1047,7 +1149,7 @@ aa /*foo
     blah*/
    aa
       aa")
-     (:mode-hook . c-mode-hook)
+     (:mode . c-mode)
      (:expected-offset . 3)))
 
   (when nil ;; disabled
@@ -1056,7 +1158,7 @@ aa /*foo
        '((:directory . "\
 /Volumes/IOMEGA_HDD/guess-offset-test/phpMyAdmin-2.10.0.2-english/")
          (:filename-pattern . ".php$")
-         (:mode-hook . php-mode-hook)
+         (:mode . php-mode)
          (:expected-offset . 4)
          (:min-confidence . 80))))))
 
@@ -1085,9 +1187,9 @@ aa /*foo
 ; Install one buffer local hook per supported major mode
 (mapcar
  (lambda (dtrt-indent-hook-mapping)
-   (add-hook (nth 0 dtrt-indent-hook-mapping)
+   (add-hook (nth 1 dtrt-indent-hook-mapping)
              `(lambda () (dtrt-indent-setup
-                          (quote ,(cdr dtrt-indent-hook-mapping))))
+                          (quote ,(cddr dtrt-indent-hook-mapping))))
              t))
  dtrt-indent-hook-mapping-list)
 
