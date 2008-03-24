@@ -242,19 +242,19 @@ quote, for example.")
 
 (defvar dtrt-indent-hook-mapping-list
 ;;   Mode            Hook                  Syntax        Variable
-  '((c-mode          c-mode-hook           c/c++/java    c-basic-offset)       ; C
-    (c++-mode        c++-mode-hook         c/c++/java    c-basic-offset)       ; C++
-    (java-mode       java-mode-hook        c/c++/java    c-basic-offset)       ; Java
-    (jde-mode        jde-mode-hook         c/c++/java    c-basic-offset)       ; Java (JDE)
-    (javascript-mode javascript-mode-hook  c/c++/java    c-basic-offset)       ; JavaScript
-    (objc-mode       objc-mode-hook        c/c++/java    c-basic-offset)       ; Objective C
-    (php-mode        php-mode-hook         c/c++/java    c-basic-offset)       ; PHP
-    (perl-mode       perl-mode-hook        perl          perl-indent-level)    ; Perl
-;;  (python-mode-hook      python        py-indent-offset)     ; Python
-    (ruby-mode       ruby-mode-hook        ruby          ruby-indent-level)    ; Ruby
-    (ada-mode        ada-mode-hook         ada           ada-indent)           ; Ada
-    (sh-mode         sh-mode-hook          shell         sh-basic-offset)      ; Shell Script
-    (pascal-mode     pascal-mode-hook      pascal        pascal-indent-level)) ; Pascal
+  '((c-mode          c/c++/java    c-basic-offset)       ; C
+    (c++-mode        c/c++/java    c-basic-offset)       ; C++
+    (java-mode       c/c++/java    c-basic-offset)       ; Java
+    (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
+    (javascript-mode c/c++/java    c-basic-offset)       ; JavaScript
+    (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
+    (php-mode        c/c++/java    c-basic-offset)       ; PHP
+    (perl-mode       perl          perl-indent-level)    ; Perl
+;;  (python-mode     python        py-indent-offset)     ; Python
+    (ruby-mode       ruby          ruby-indent-level)    ; Ruby
+    (ada-mode        ada           ada-indent)           ; Ada
+    (sh-mode         shell         sh-basic-offset)      ; Shell Script
+    (pascal-mode     pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
 
 ;;;-----------------------------------------------------------------
@@ -497,6 +497,10 @@ By default, all files are analyzed."
 (defvar dtrt-indent-original-indent)
 (make-variable-buffer-local
  'dtrt-indent-original-indent)
+
+(defvar dtrt-indent-mode-line-info)
+(make-variable-buffer-local
+ 'dtrt-indent-mode-line-info)
 
 (defun dtrt-indent--replace-in-string (haystack
                                         needle-regexp
@@ -768,14 +772,14 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                   hard-tab-percentage)
                dtrt-indent-min-soft-tab-superiority))
         (setq change-indent-tabs-mode t)
-        (setq indent-tabs-mode-settings nil))
+        (setq indent-tabs-mode-setting nil))
 
        ((or (= 0 soft-tab-percentage)
             (> (/ hard-tab-percentage
                   soft-tab-percentage)
                dtrt-indent-min-hard-tab-superiority))
         (setq change-indent-tabs-mode t)
-        (setq indent-tabs-mode-settings t)))
+        (setq indent-tabs-mode-setting t)))
 
       (list (cons :histogram (car histogram-and-total-lines))
             (cons :total-lines total-lines)
@@ -787,7 +791,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
             (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
             (cons :soft-tab-percentage soft-tab-percentage)
             (cons :change-indent-tabs-mode change-indent-tabs-mode)
-            (cons :indent-tabs-mode-settings indent-tabs-mode-settings)
+            (cons :indent-tabs-mode-setting indent-tabs-mode-setting)
             (cons :rejected rejected)
             (cons :confidence confidence)))))
 
@@ -808,8 +812,8 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
           (cdr (assoc :confidence result)))
          (change-indent-tabs-mode
           (cdr (assoc :change-indent-tabs-mode result)))
-         (indent-tabs-mode-settings
-          (cdr (assoc :indent-tabs-mode-settings result)))
+         (indent-tabs-mode-setting
+          (cdr (assoc :indent-tabs-mode-setting result)))
          (best-indent-offset
           (nth 0 best-guess))
          (indent-offset-variable
@@ -831,7 +835,7 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
                     (local-variable-p indent-offset-variable)))
         (set (make-local-variable indent-offset-variable) best-indent-offset)
         (when change-indent-tabs-mode
-          (set (make-local-variable 'indent-tabs-mode) indent-tabs-mode-settings))
+          (set (make-local-variable 'indent-tabs-mode) indent-tabs-mode-setting))
         (when (>= dtrt-indent-verbosity 1)
           (let ((offset-info (format "%s adjusted to %s%s"
                                      indent-offset-variable
@@ -839,9 +843,11 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
                                      (if (>= dtrt-indent-verbosity 2)
                                          (format " (%.0f%% confidence)" (* 100 confidence))
                                        "")))
-                (tabs-mode-info (when change-indent-tabs-mode
-                                  (format " and indent-tabs-mode adjusted to %s" indent-tabs-mode-settings))))
+                (tabs-mode-info (when (and change-indent-tabs-mode
+                                           (not (eq indent-tabs-mode-setting indent-tabs-mode)))
+                                  (format " and indent-tabs-mode adjusted to %s" indent-tabs-mode-setting))))
             (message (concat "Note: " offset-info tabs-mode-info))))
+        (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
         best-indent-offset))
      (t
       (when (>= dtrt-indent-verbosity 2)
@@ -850,10 +856,14 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
 
 (defun dtrt-indent-find-file-hook ()
   "Try adjusting indentation offset when a file is loaded."
-  (when (and dtrt-indent-mode
-             dtrt-indent-buffer-language-and-variable
-             (funcall dtrt-indent-accept-file-function buffer-file-name))
-    (dtrt-indent-try-set-offset)))
+  (when dtrt-indent-mode
+    (let ((language-and-variable
+           (cdr (assoc major-mode
+                       dtrt-indent-hook-mapping-list))))
+      (when (and language-and-variable
+                 (funcall dtrt-indent-accept-file-function buffer-file-name))
+        (dtrt-indent-setup language-and-variable)
+        (dtrt-indent-try-set-offset)))))
 
 (defun dtrt-indent-setup (language-and-variable)
   "Setup dtrt-indent per buffer.
@@ -876,7 +886,7 @@ buffer."
         (if mapping-entry
             (set (make-local-variable
                   'dtrt-indent-buffer-language-and-variable)
-                 (cddr mapping-entry))
+                 (cdr mapping-entry))
           (error "Major mode %s not supported by dtrt-indent" major-mode))))
     (dtrt-indent-try-set-offset)))
   
@@ -913,7 +923,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
       (if mapping-entry
           (set (make-local-variable
                 'dtrt-indent-buffer-language-and-variable)
-               (cddr mapping-entry))
+               (cdr mapping-entry))
         (error "Major mode %s not supported by dtrt-indent" major-mode))))
   (require 'benchmark)
   (let* (result
@@ -930,7 +940,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
          (soft-tab-lines (cdr (assoc :soft-tab-lines result)))
          (soft-tab-percentage (cdr (assoc :soft-tab-percentage result)))
          (change-indent-tabs-mode (cdr (assoc :change-indent-tabs-mode result)))
-         (indent-tabs-mode-settings (cdr (assoc :indent-tabs-mode-settings result)))
+         (indent-tabs-mode-setting (cdr (assoc :indent-tabs-mode-setting result)))
          (analysis (cdr (assoc :analysis result)))
          (best-guess (cdr (assoc :best-guess result)))
          (second-best-guess (cdr (assoc :second-best-guess result)))
@@ -1019,7 +1029,7 @@ required)\n"
                        (nth 0 best-guess)
                        (* 100.0 confidence)))
         (princ (format "  Change indent-tab-setting: %s\n"
-                       (if change-indent-tabs-mode (format "yes, to %s" indent-tabs-mode-settings) "no")))))))
+                       (if change-indent-tabs-mode (format "yes, to %s" indent-tabs-mode-setting) "no")))))))
 
 
 ;; The following is from font-lock.el
@@ -1067,8 +1077,8 @@ required)\n"
       (setq dtrt-indent-min-relevant-lines 3)
       (insert (cdr (assoc :buffer-contents args)))
       (let ((language-and-variable
-             (cddr (assoc (cdr (assoc :mode args))
-                          dtrt-indent-hook-mapping-list))))
+             (cdr (assoc (cdr (assoc :mode args))
+                         dtrt-indent-hook-mapping-list))))
         (when (not language-and-variable)
           (error "Unknown mode `%s'" (cdr (assoc :mode args))))
         (dtrt-indent-setup language-and-variable)
@@ -1123,8 +1133,8 @@ required)\n"
            (insert-file-contents-literally file)
            (set (make-local-variable
                  'dtrt-indent-buffer-language-and-variable)
-                (cddr (assoc (cdr (assoc :mode args))
-                             dtrt-indent-hook-mapping-list)))
+                (cdr (assoc (cdr (assoc :mode args))
+                            dtrt-indent-hook-mapping-list)))
            (dtrt-indent-try-adjust)))))))
 
   ;; Functional tests
@@ -1173,7 +1183,9 @@ aa /*foo
 
 (defadvice hack-one-local-variable
   (before dtrt-indent-advise-hack-one-local-variable activate)
-  "Disable dtrt-indent if offset explicitly set."
+  "Adviced by dtrt-indent.
+
+Disable dtrt-indent if offset explicitly set."
   (when (and dtrt-indent-mode
              (eql (nth 1 dtrt-indent-buffer-language-and-variable)
                   (ad-get-arg 0)))
@@ -1184,17 +1196,11 @@ aa /*foo
 ; Install global find-file-hook
 (add-hook 'find-file-hook 'dtrt-indent-find-file-hook)
 
-; Install one buffer local hook per supported major mode
-(mapcar
- (lambda (dtrt-indent-hook-mapping)
-   (add-hook (nth 1 dtrt-indent-hook-mapping)
-             `(lambda () (dtrt-indent-setup
-                          (quote ,(cddr dtrt-indent-hook-mapping))))
-             t))
- dtrt-indent-hook-mapping-list)
-
-; Register minor mode
-(add-to-list 'minor-mode-alist '(dtrt-indent-mode " Dtrt-Indent"))
+; Customize mode line
+(or global-mode-string (setq global-mode-string '("")))
+(or (memq 'dtrt-indent-mode-line-info global-mode-string)
+    (setq global-mode-string
+          (append global-mode-string '(dtrt-indent-mode-line-info))))
 
 (provide 'dtrt-indent)
 
