@@ -700,8 +700,8 @@ TBD"
                               (nth 0 histogram-and-total-lines)
                               (nth 1 histogram-and-total-lines)))))
               (setq try-offset (1+ try-offset)))
-            (sort unsorted-analysis (lambda (x y) (> (nth 1 x) (nth 1 y))))))
-
+            (sort unsorted-analysis (lambda (x y) (> (nth 1 x) 
+                                                     (nth 1 y))))))
          (analysis-iterator analysis))
 
     (while analysis-iterator
@@ -757,7 +757,8 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               "no best guess")
              ((< (* 100.0 (nth 1 best-guess))
                  dtrt-indent-min-quality)
-              (format "best guess below minimum quality (%f < %f)" (* 100.0 (nth 1 best-guess))
+              (format "best guess below minimum quality (%f < %f)" 
+                      (* 100.0 (nth 1 best-guess))
                       dtrt-indent-min-quality))
              ((and second-best-guess
                    (< (- (/ (* 100.0 (nth 1 best-guess))
@@ -833,19 +834,26 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
               (list indent-offset-variable
                     (eval indent-offset-variable)
                     (local-variable-p indent-offset-variable)))
-        (set (make-local-variable indent-offset-variable) best-indent-offset)
+        (set (make-local-variable indent-offset-variable) 
+             best-indent-offset)
         (when change-indent-tabs-mode
-          (set (make-local-variable 'indent-tabs-mode) indent-tabs-mode-setting))
+          (set (make-local-variable 'indent-tabs-mode) 
+               indent-tabs-mode-setting))
         (when (>= dtrt-indent-verbosity 1)
-          (let ((offset-info (format "%s adjusted to %s%s"
-                                     indent-offset-variable
-                                     best-indent-offset
-                                     (if (>= dtrt-indent-verbosity 2)
-                                         (format " (%.0f%% confidence)" (* 100 confidence))
-                                       "")))
-                (tabs-mode-info (when (and change-indent-tabs-mode
-                                           (not (eq indent-tabs-mode-setting indent-tabs-mode)))
-                                  (format " and indent-tabs-mode adjusted to %s" indent-tabs-mode-setting))))
+          (let ((offset-info
+                 (format "%s adjusted to %s%s"
+                         indent-offset-variable
+                         best-indent-offset
+                         (if (>= dtrt-indent-verbosity 2)
+                             (format " (%.0f%% confidence)" 
+                                     (* 100 confidence))
+                           "")))
+                (tabs-mode-info
+                 (when (and change-indent-tabs-mode
+                            (not (eq indent-tabs-mode-setting 
+                                     indent-tabs-mode)))
+                   (format " and indent-tabs-mode adjusted to %s" 
+                           indent-tabs-mode-setting))))
             (message (concat "Note: " offset-info tabs-mode-info))))
         (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
         best-indent-offset))
@@ -861,7 +869,8 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
            (cdr (assoc major-mode
                        dtrt-indent-hook-mapping-list))))
       (when (and language-and-variable
-                 (funcall dtrt-indent-accept-file-function buffer-file-name))
+                 (funcall dtrt-indent-accept-file-function 
+                          buffer-file-name))
         (dtrt-indent-setup language-and-variable)
         (dtrt-indent-try-set-offset)))))
 
@@ -933,18 +942,30 @@ Note: killed buffer-local value for %s, restoring to default %d"
                   (dtrt-indent--analyze
                    (dtrt-indent--calc-histogram
                     (car dtrt-indent-buffer-language-and-variable))))))
-         (histogram (cdr (assoc :histogram result)))
-         (total-lines (cdr (assoc :total-lines result)))
-         (hard-tab-lines (cdr (assoc :hard-tab-lines result)))
-         (hard-tab-percentage (cdr (assoc :hard-tab-percentage result)))
-         (soft-tab-lines (cdr (assoc :soft-tab-lines result)))
-         (soft-tab-percentage (cdr (assoc :soft-tab-percentage result)))
-         (change-indent-tabs-mode (cdr (assoc :change-indent-tabs-mode result)))
-         (indent-tabs-mode-setting (cdr (assoc :indent-tabs-mode-setting result)))
-         (analysis (cdr (assoc :analysis result)))
-         (best-guess (cdr (assoc :best-guess result)))
-         (second-best-guess (cdr (assoc :second-best-guess result)))
-         (confidence (cdr (assoc :confidence result))))
+         (histogram
+          (cdr (assoc :histogram result)))
+         (total-lines
+          (cdr (assoc :total-lines result)))
+         (hard-tab-lines
+          (cdr (assoc :hard-tab-lines result)))
+         (hard-tab-percentage
+          (cdr (assoc :hard-tab-percentage result)))
+         (soft-tab-lines
+          (cdr (assoc :soft-tab-lines result)))
+         (soft-tab-percentage
+          (cdr (assoc :soft-tab-percentage result)))
+         (change-indent-tabs-mode
+          (cdr (assoc :change-indent-tabs-mode result)))
+         (indent-tabs-mode-setting
+          (cdr (assoc :indent-tabs-mode-setting result)))
+         (analysis
+          (cdr (assoc :analysis result)))
+         (best-guess
+          (cdr (assoc :best-guess result)))
+         (second-best-guess
+          (cdr (assoc :second-best-guess result)))
+         (confidence
+          (cdr (assoc :confidence result))))
 
     (with-output-to-temp-buffer "*dtrt-indent-debug*"
       (princ (format "\nGuessing offset for %s\n\n"
@@ -1029,7 +1050,9 @@ required)\n"
                        (nth 0 best-guess)
                        (* 100.0 confidence)))
         (princ (format "  Change indent-tab-setting: %s\n"
-                       (if change-indent-tabs-mode (format "yes, to %s" indent-tabs-mode-setting) "no")))))))
+                       (if change-indent-tabs-mode
+                           (format "yes, to %s" indent-tabs-mode-setting) 
+                         "no")))))))
 
 
 ;; The following is from font-lock.el
@@ -1191,7 +1214,8 @@ Disable dtrt-indent if offset explicitly set."
                   (ad-get-arg 0)))
     (setq dtrt-indent-buffer-language-and-variable nil)
     (when (>= dtrt-indent-verbosity 1)
-      (message "Indentation offset set with File Variable; not adjusted"))))
+      (message "\n
+Indentation offset set with File Variable; not adjusted"))))
 
 ; Install global find-file-hook
 (add-hook 'find-file-hook 'dtrt-indent-find-file-hook)
