@@ -502,6 +502,14 @@ By default, all files are analyzed."
 (make-variable-buffer-local
  'dtrt-indent-mode-line-info)
 
+(defvar dtrt-indent-explicit-offset)
+(make-variable-buffer-local
+ 'dtrt-indent-explicit-offset)
+
+(defvar dtrt-indent-explicit-tab-mode)
+(make-variable-buffer-local
+ 'dtrt-indent-explicit-tab-mode)
+
 (defun dtrt-indent--replace-in-string (haystack
                                         needle-regexp
                                         replacement)
@@ -824,39 +832,43 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
            (not rejected)
            (not (eq (symbol-value indent-offset-variable)
                     best-indent-offset)))
-      (when (or (not dtrt-indent-require-confirmation-flag)
-                (yes-or-no-p
-                 (format "Do you want to adjust %s to %s for buffer %s? "
-                         indent-offset-variable
-                         best-indent-offset
-                         (buffer-name))))
-        (setq dtrt-indent-original-indent
-              (list indent-offset-variable
-                    (eval indent-offset-variable)
-                    (local-variable-p indent-offset-variable)))
-        (set (make-local-variable indent-offset-variable)
-             best-indent-offset)
-        (when change-indent-tabs-mode
-          (set (make-local-variable 'indent-tabs-mode)
-               indent-tabs-mode-setting))
-        (when (>= dtrt-indent-verbosity 1)
-          (let ((offset-info
-                 (format "%s adjusted to %s%s"
-                         indent-offset-variable
-                         best-indent-offset
-                         (if (>= dtrt-indent-verbosity 2)
-                             (format " (%.0f%% confidence)"
-                                     (* 100 confidence))
-                           "")))
-                (tabs-mode-info
-                 (when (and change-indent-tabs-mode
-                            (not (eq indent-tabs-mode-setting
-                                     indent-tabs-mode)))
-                   (format " and indent-tabs-mode adjusted to %s"
-                           indent-tabs-mode-setting))))
-            (message (concat "Note: " offset-info tabs-mode-info))))
-        (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
-        best-indent-offset))
+
+      (if dtrt-indent-explicit-offset
+          (message "\
+Indentation offset set with file variable; not adjusted")
+        (when (or (not dtrt-indent-require-confirmation-flag)
+                  (yes-or-no-p
+                   (format "Do you want to adjust %s to %s for buffer %s? "
+                           indent-offset-variable
+                           best-indent-offset
+                           (buffer-name))))
+          (setq dtrt-indent-original-indent
+                (list indent-offset-variable
+                      (eval indent-offset-variable)
+                      (local-variable-p indent-offset-variable)))
+          (set (make-local-variable indent-offset-variable)
+               best-indent-offset)
+          (when change-indent-tabs-mode
+            (set (make-local-variable 'indent-tabs-mode)
+                 indent-tabs-mode-setting))
+          (when (>= dtrt-indent-verbosity 1)
+            (let ((offset-info
+                   (format "%s adjusted to %s%s"
+                           indent-offset-variable
+                           best-indent-offset
+                           (if (>= dtrt-indent-verbosity 2)
+                               (format " (%.0f%% confidence)"
+                                       (* 100 confidence))
+                             "")))
+                  (tabs-mode-info
+                   (when (and change-indent-tabs-mode
+                              (not (eq indent-tabs-mode-setting
+                                       indent-tabs-mode)))
+                     (format " and indent-tabs-mode adjusted to %s"
+                             indent-tabs-mode-setting))))
+              (message (concat "Note: " offset-info tabs-mode-info))))
+          (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
+          best-indent-offset)))
      (t
       (when (>= dtrt-indent-verbosity 2)
         (message "Note: %s not adjusted" indent-offset-variable))
@@ -1209,13 +1221,14 @@ aa /*foo
   "Adviced by dtrt-indent.
 
 Disable dtrt-indent if offset explicitly set."
-  (when (and dtrt-indent-mode
-             (eql (nth 1 dtrt-indent-buffer-language-and-variable)
-                  (ad-get-arg 0)))
-    (setq dtrt-indent-buffer-language-and-variable nil)
-    (when (>= dtrt-indent-verbosity 1)
-      (message "\n
-Indentation offset set with File Variable; not adjusted"))))
+  (cond
+   ((eql (nth 2 (assoc major-mode
+                       dtrt-indent-hook-mapping-list))
+         (ad-get-arg 0))
+    (setq dtrt-indent-explicit-offset t))
+   ((eql 'indent-tab-mode
+         (ad-get-arg 0))
+    (setq dtrt-indent-explicit-tab-mode t))))
 
 ; Install global find-file-hook
 (add-hook 'find-file-hook 'dtrt-indent-find-file-hook)
