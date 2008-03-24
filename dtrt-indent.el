@@ -677,7 +677,7 @@ rejected: too few distinct matching offsets (%d required)"
                     dtrt-indent-min-matching-indentations))
            (t
             nil)))))
-  
+
 (defun dtrt-indent--analyze (histogram-and-total-lines)
   "Analyze the histogram.
 
@@ -700,7 +700,7 @@ TBD"
                               (nth 0 histogram-and-total-lines)
                               (nth 1 histogram-and-total-lines)))))
               (setq try-offset (1+ try-offset)))
-            (sort unsorted-analysis (lambda (x y) (> (nth 1 x) 
+            (sort unsorted-analysis (lambda (x y) (> (nth 1 x)
                                                      (nth 1 y))))))
          (analysis-iterator analysis))
 
@@ -757,7 +757,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               "no best guess")
              ((< (* 100.0 (nth 1 best-guess))
                  dtrt-indent-min-quality)
-              (format "best guess below minimum quality (%f < %f)" 
+              (format "best guess below minimum quality (%f < %f)"
                       (* 100.0 (nth 1 best-guess))
                       dtrt-indent-min-quality))
              ((and second-best-guess
@@ -834,10 +834,10 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
               (list indent-offset-variable
                     (eval indent-offset-variable)
                     (local-variable-p indent-offset-variable)))
-        (set (make-local-variable indent-offset-variable) 
+        (set (make-local-variable indent-offset-variable)
              best-indent-offset)
         (when change-indent-tabs-mode
-          (set (make-local-variable 'indent-tabs-mode) 
+          (set (make-local-variable 'indent-tabs-mode)
                indent-tabs-mode-setting))
         (when (>= dtrt-indent-verbosity 1)
           (let ((offset-info
@@ -845,14 +845,14 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
                          indent-offset-variable
                          best-indent-offset
                          (if (>= dtrt-indent-verbosity 2)
-                             (format " (%.0f%% confidence)" 
+                             (format " (%.0f%% confidence)"
                                      (* 100 confidence))
                            "")))
                 (tabs-mode-info
                  (when (and change-indent-tabs-mode
-                            (not (eq indent-tabs-mode-setting 
+                            (not (eq indent-tabs-mode-setting
                                      indent-tabs-mode)))
-                   (format " and indent-tabs-mode adjusted to %s" 
+                   (format " and indent-tabs-mode adjusted to %s"
                            indent-tabs-mode-setting))))
             (message (concat "Note: " offset-info tabs-mode-info))))
         (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
@@ -869,7 +869,7 @@ Buffer hasn't been prepared using dtrt-indent-setup"))
            (cdr (assoc major-mode
                        dtrt-indent-hook-mapping-list))))
       (when (and language-and-variable
-                 (funcall dtrt-indent-accept-file-function 
+                 (funcall dtrt-indent-accept-file-function
                           buffer-file-name))
         (dtrt-indent-setup language-and-variable)
         (dtrt-indent-try-set-offset)))))
@@ -898,7 +898,7 @@ buffer."
                  (cdr mapping-entry))
           (error "Major mode %s not supported by dtrt-indent" major-mode))))
     (dtrt-indent-try-set-offset)))
-  
+
 (defun dtrt-indent-undo ()
   "Undo any change dtrt-indent made to the indentation offset."
   (interactive)
@@ -1012,7 +1012,7 @@ distinct offsets - %s\n"
                              (or (nth 3 analysis-entry) "CONSIDERED")))
                    analysis))))
         (princ "\nSummary:\n\n")
-            
+
         (princ
          (format "\
   Best guess is offset %d with %.2f%% matching lines \(%.2f%% \
@@ -1020,7 +1020,7 @@ required)\n"
                  (nth 0 best-guess)
                  (* 100.0 (nth 1 best-guess))
                  dtrt-indent-min-quality))
-        
+
         (if second-best-guess
             (progn
               (princ
@@ -1051,7 +1051,7 @@ required)\n"
                        (* 100.0 confidence)))
         (princ (format "  Change indent-tab-setting: %s\n"
                        (if change-indent-tabs-mode
-                           (format "yes, to %s" indent-tabs-mode-setting) 
+                           (format "yes, to %s" indent-tabs-mode-setting)
                          "no")))))))
 
 
@@ -1142,7 +1142,7 @@ required)\n"
     (princ (format "Performing bulk test on %s\n"
                    (cdr (assoc :directory args))))
     (setq dtrt-indent-verbosity 0)
-  
+
     (dtrt-indent-test-rec-directory-files
      (cdr (assoc :directory args))
      (cdr (assoc :filename-pattern args))
