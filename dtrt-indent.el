@@ -125,13 +125,10 @@
 ;; - verbose and diagnostics messages
 ;; - make sure variable documentation match their function
 ;; - make sure defaults are sensible
-;; - double-check that for potentially derived modes (e.g. c++,
-;;   objective c), hooks are only registered/executed once
 ;; - complete info page
 ;; - bulk (real world) tests
 ;; - functional tests
 ;; - unit tests
-;; - c-basic-offset value?
 
 ;;; Change log:
 
@@ -256,9 +253,9 @@ quote, for example.")
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
     (pascal-mode     pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
-
-;;;-----------------------------------------------------------------
-;;; Customization Definitions:
+
+;;-----------------------------------------------------------------
+;; Customization Definitions:
 
 (defgroup dtrt-indent nil
   "Transparently adapt to foreign indentation offsets."
@@ -922,7 +919,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
       (when (>= dtrt-indent-verbosity 1)
         (message info))
       (kill-local-variable 'dtrt-indent-original-indent))))
-
+
 ;;-----------------------------------------------------------------
 ;; Diagnostic functions
 
@@ -1095,7 +1092,7 @@ required)\n"
                               'face '(background-color . "red"))
            t)
          nil)))))
-
+
 ;;-----------------------------------------------------------------
 ;; Tests
 
@@ -1196,8 +1193,7 @@ aa /*foo
          (:mode . php-mode)
          (:expected-offset . 4)
          (:min-confidence . 80))))))
-
-
+
 ;;-----------------------------------------------------------------
 ;; Installation
 
