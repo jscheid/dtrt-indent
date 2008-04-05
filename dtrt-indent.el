@@ -3,7 +3,6 @@
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Created: 22 Mar 2008
 ;; Version: 0.2.0
 ;; Keywords: convenience files languages c
 
@@ -19,14 +18,14 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this software; see the file COPYING.  If not, write to
-;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301 USA
 
 ;;; Commentary:
 
 ;; A minor mode that guesses the indentation offset originally used
 ;; for creating source code files and transparently adjusts the
-;; corresponding settings in Emacs, making it more conventient to edit
+;; corresponding settings in Emacs, making it more convenient to edit
 ;; foreign files.
 ;;
 ;; This hooks into many major modes - c-mode, java-mode, shell-mode
@@ -103,7 +102,7 @@
 ;;
 ;; Limitations:
 ;;
-;; - dtrt-indent does not deal well with files that use variable
+;; - dtrt-indent can't deal well with files that use variable
 ;;   indentation offsets, e.g. files that use varying indentation
 ;;   based on the outer construct.
 ;;
@@ -114,11 +113,8 @@
 ;;   indentation style.  For instance, it does not detect whether a
 ;;   C-like file uses hanging braces or not.
 ;;
-;; - dtrt-indent guesses the indendation offset, not the (hard) tab
-;;   width used in a file.  If you're loading a source file that uses
-;;   hard tabs mixed with spaces for indentation, and it was created
-;;   with a different tab size than the one assumed by Emacs, you'll
-;;   end up with messy indentation - dtrt-indent won't be any help.
+;; - dtrt-indent can't deal well with files that mix hard tabs with
+;; - spaces for indentation.
 ;;
 ;; TODO:
 ;;
@@ -281,7 +277,7 @@ use either \\[customize] or the function `dtrt-indent-mode'."
 How much dtrt-indent should tell you about what it's doing.  If
 this is 1, the default, dtrt-indent will only let you know when
 it adjusts the indentation offset but will be silent otherwise.
-By setting this to 2, it will also tell you why it didn't adjust
+By setting this to 2 it will also tell you why it didn't adjust
 the offset.  You might want to try this as a first measure if
 you're unhappy with dtrt-indent's actions.  A setting of 3 will
 output lots of diagnostic information.  Finally, a setting of 0
@@ -300,9 +296,9 @@ Whether dtrt-indent asks for confirmation whenever it is about to
 make any adjustments.  By default, adjustments are made without
 your explicit consent because dtrt-indent is already quite
 conservative and tries to 'do the right thing', adjustments can
-be undone easily and they aren't harmful in the first place.
-However, if you feel like it's doing things behind your back,
-enable this setting."
+be undone easily, and they aren't harmful in the first place.
+However, if you feel like it's doing things behind your back
+you should enable this setting."
   :type 'boolean
   :tag "Require Confirmation"
   :group 'dtrt-indent)
@@ -311,9 +307,9 @@ enable this setting."
   "*Minimum number of relevant lines required for a guess to be made.
 
 This check is in place because with a very low number of lines
-that can be analyzed, the chances of a wrong guess are rather
+that can be analyzed the chances of a wrong guess are rather
 high because the sample size is so small.  If you are getting
-false positives on small files - i.e. the wrong offset is guessed
+false positives with small files - i.e. the wrong offset is guessed
 - you might want to increase this setting.  On the other hand, if
 you are getting false negatives on small files - i.e. no guess is
 made on a small file - you might want to decrease it."
@@ -324,13 +320,13 @@ made on a small file - you might want to decrease it."
 (defcustom dtrt-indent-max-relevant-lines 500
   "*Maximum number of relevant lines to be considered in analysis.
 
-This setting is meant to prevent dtrt-indent to spend large
+This setting is meant to prevent dtrt-indent from spending large
 amounts of time on analyzing large source files.  In general, the
-higher this setting, the more accurate the guess will be, but the
+higher this setting, the more accurate the guess will be but the
 more time dtrt-indent will consume when opening files.  If you
-have a fast box, you might want to consider increasing this
+have a fast box you might want to consider increasing this
 number.  On the other hand, if you find that dtrt-indent
-introduces a noticable delay when opening files, you might want
+introduces a noticable delay when opening files you might want
 to decrease it."
   :type 'integer
   :tag "Maximum Number Of Relevant Lines"
@@ -341,10 +337,9 @@ to decrease it."
 
 Percentage (0-100) of lines that are indented by a non-zero
 amount of spaces divisible by a given offset required for that
-offset to be eligible for guessing.  The default value of 80
-means that for instance, an indentation level of 4 will only be
-guessed if at least 80% of all lines are indented by an offset
-divisible by 4.
+offset to be eligible for guessing.  A value of 80 means that for
+instance, an indentation level of 4 will only be guessed if at
+least 80% of all lines are indented by an offset divisible by 4.
 
 This setting essentially controls how lenient or conservative
 dtrt-indent operates.  If you are getting false positives -
@@ -362,9 +357,10 @@ false negatives - i.e. guess-offset refuses to adjust the offset
 The percentage (0-100, but higher values than 100 are possible)
 that the number of lines matching the best guess must be higher
 than the number of lines matching the second best guess in order
-for dtrt-indent to adjust the offset.  The default value of 100
-means that there must be twice as many lines matching the best
-guess than the number of lines matching the second best guess.
+for dtrt-indent to adjust the offset.  For example, a value of
+100 means that there must be twice as many lines matching the
+best guess than the number of lines matching the second best
+guess.
 
 This check is in place to avoid a good guess to be accepted if
 there is another, similarly good guess, because in that situation
@@ -386,7 +382,7 @@ TBD"
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-min-hard-tab-superiority 100.0
-  "*Minimum percentage hard-tab lines need to outnumber hard-tab ones.
+  "*Minimum percentage hard-tab lines need to outnumber soft-tab ones.
 
 TBD"
   :type 'float
@@ -422,10 +418,10 @@ increase it."
   "*Non-nil means ignore lines containing only a single character.
 
 Whether to treat lines that contain only a single non-whitespace
-character as irrelevant for the analysis.  This defaults to t in
-order to avoid hanging braces etc.  to skew the results.  Set it
-to nil if you are dealing with source files whose indentation
-level isn't reliably guessed without those lines."
+character as irrelevant for the analysis.  Set this to t in to
+prevent hanging braces etc. from skewing the results.  Set it to
+nil if you are dealing with source files whose indentation level
+isn't reliably guessed without those lines."
   :type 'boolean
   :tag "Ignore Single-Character Lines"
   :group 'dtrt-indent)
@@ -435,12 +431,12 @@ level isn't reliably guessed without those lines."
 
 The minimum number of distinct, non-zero indentation levels
 matching a given offset required to be present in a file for that
-offset to be eligible for guessing.  The default value of 2 means
-that for instance, an indentation level of 4 will only be guessed
-if some lines are indented at 4 spaces and some at 8; or if some
-lines are indented at 12 spaces and some at 20; but not if some
-lines are indented at 4 spaces but there are no other lines
-indented at an offset divisible by 4.
+offset to be eligible for guessing.  A value of 2 means that for
+instance, an indentation level of 4 will only be guessed if some
+lines are indented at 4 spaces and some at 8; or if some lines
+are indented at 12 spaces and some at 20; but not if some lines
+are indented at 4 spaces but there are no other lines indented at
+an offset divisible by 4.
 
 The default value of 1 effectively disables any such requirement.
 If you are getting false positives, you might want to set this to
