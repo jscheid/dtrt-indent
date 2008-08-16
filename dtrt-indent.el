@@ -161,6 +161,8 @@ offset will be guessed for newly opened files and adjusted
 transparently."
   :global t :group 'dtrt-indent)
 
+(require 'cl)
+
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
