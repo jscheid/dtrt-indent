@@ -375,7 +375,7 @@ refuses to adjust the offset - you might want to decrease it."
   :tag "Minimum Superiority Of Best Guess"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-soft-tab-superiority 100.0
+(defcustom dtrt-indent-min-soft-tab-superiority 300.0
   "*Minimum percentage soft-tab lines need to outnumber hard-tab ones.
 
 TBD"
@@ -383,7 +383,7 @@ TBD"
   :tag "Minimum Superiority Of Soft Tabs"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-hard-tab-superiority 100.0
+(defcustom dtrt-indent-min-hard-tab-superiority 300.0
   "*Minimum percentage hard-tab lines need to outnumber soft-tab ones.
 
 TBD"
@@ -768,16 +768,16 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
 
       (cond
        ((or (= 0 hard-tab-percentage)
-            (> (/ soft-tab-percentage
-                  hard-tab-percentage)
-               (+ 1.0 (/ dtrt-indent-min-soft-tab-superiority 100.0))))
+            (>= (/ soft-tab-percentage
+                   hard-tab-percentage)
+                (+ 1.0 (/ dtrt-indent-min-soft-tab-superiority 100.0))))
         (setq change-indent-tabs-mode t)
         (setq indent-tabs-mode-setting nil))
 
        ((or (= 0 soft-tab-percentage)
-            (> (/ hard-tab-percentage
-                  soft-tab-percentage)
-               (+ 1.0 (/ dtrt-indent-min-hard-tab-superiority 100.0))))
+            (>= (/ hard-tab-percentage
+                   soft-tab-percentage)
+                (+ 1.0 (/ dtrt-indent-min-hard-tab-superiority 100.0))))
         (setq change-indent-tabs-mode t)
         (setq indent-tabs-mode-setting t)))
 
@@ -1211,6 +1211,7 @@ aa /*foo
 	tabbed-line
 	tabbed-line
 	tabbed-line
+	tabbed-line
         softspace-line")
      (:mode . c-mode)
      (:expected-tab-setting . hard)
@@ -1219,6 +1220,7 @@ aa /*foo
   (dtrt-indent-functional-test
    '((:buffer-contents . "\
 	tabbed-line
+        softspace-line
         softspace-line
         softspace-line
         softspace-line")
