@@ -741,11 +741,11 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               0))
            (total-lines (nth 1 histogram-and-total-lines))
            (hard-tab-percentage (if (> total-lines 0)
-                                    (/ (nth 2 histogram-and-total-lines)
+                                    (/ (float (nth 2 histogram-and-total-lines))
                                        total-lines)
                                   0))
            (soft-tab-percentage (if (> total-lines 0)
-                                    (/ (nth 3 histogram-and-total-lines)
+                                    (/ (float (nth 3 histogram-and-total-lines))
                                        total-lines)
                                   0))
            (change-indent-tabs-mode)
@@ -770,14 +770,14 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
        ((or (= 0 hard-tab-percentage)
             (> (/ soft-tab-percentage
                   hard-tab-percentage)
-               dtrt-indent-min-soft-tab-superiority))
+               (+ 1.0 (/ dtrt-indent-min-soft-tab-superiority 100.0))))
         (setq change-indent-tabs-mode t)
         (setq indent-tabs-mode-setting nil))
 
        ((or (= 0 soft-tab-percentage)
             (> (/ hard-tab-percentage
                   soft-tab-percentage)
-               dtrt-indent-min-hard-tab-superiority))
+               (+ 1.0 (/ dtrt-indent-min-hard-tab-superiority 100.0))))
         (setq change-indent-tabs-mode t)
         (setq indent-tabs-mode-setting t)))
 
@@ -1094,7 +1094,7 @@ required)\n"
 ;;-----------------------------------------------------------------
 ;; Tests
 
-(eval-when-compile
+(defun dtrt-indent-run-tests ()
 
   (defun dtrt-indent-functional-test (args)
     (with-temp-buffer
@@ -1120,11 +1120,26 @@ required)\n"
               (nth 0 best-guess))
              (indent-offset-variable
               (nth 1 language-and-variable))
+             (change-indent-tabs-mode
+              (cdr (assoc :change-indent-tabs-mode result)))
+             (indent-tabs-mode-setting
+              (cdr (assoc :indent-tabs-mode-setting result)))
              (expected-offset
-              (cdr (assoc :expected-offset args))))
+              (cdr (assoc :expected-offset args)))
+             (expected-tab-setting
+              (cdr (assoc :expected-tab-setting args))))
+        (cond
+         ((eq expected-tab-setting 'hard)
+            (assert (eq change-indent-tabs-mode t))
+            (assert (eq indent-tabs-mode-setting t)))
+         ((eq expected-tab-setting 'soft)
+            (assert (eq change-indent-tabs-mode t))
+            (assert (eq indent-tabs-mode-setting nil)))
+         ((eq expected-tab-setting 'undecided)
+            (assert (eq change-indent-tabs-mode nil))))
         (if expected-offset
             (assert (eq nil rejected) t)
-          (assert (not (eq nil rejected)) t))
+          (assert (not (eq nil rejected)) t))          
         (assert (eq expected-offset
                     best-indent-offset) t))))
 
@@ -1181,6 +1196,37 @@ aa /*foo
       aa")
      (:mode . c-mode)
      (:expected-offset . 3)))
+
+  (dtrt-indent-functional-test
+   '((:buffer-contents . "\
+	tabbed-line
+	tabbed-line
+	tabbed-line
+        softspace-line")
+     (:mode . c-mode)
+     (:expected-tab-setting . hard)
+     (:expected-offset . 8)))
+
+  (dtrt-indent-functional-test
+   '((:buffer-contents . "\
+	tabbed-line
+        softspace-line
+        softspace-line
+        softspace-line")
+     (:mode . c-mode)
+     (:expected-tab-setting . soft)
+     (:expected-offset . 8)))
+
+  (dtrt-indent-functional-test
+   '((:buffer-contents . "\
+	tabbed-line
+	tabbed-line
+	tabbed-line
+        softspace-line
+        softspace-line")
+     (:mode . c-mode)
+     (:expected-tab-setting . undecided)
+     (:expected-offset . 8)))
 
   (when nil ;; disabled
     (with-output-to-temp-buffer "*dtrt-indent-test-results*"
