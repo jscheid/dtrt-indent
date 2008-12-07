@@ -1037,10 +1037,19 @@ required)\n"
             (princ
              (format "  There is no second best guess\n")))
 
-          (princ (format "  Hard tab percentage: %f (%d lines)\n"
-                         hard-tab-percentage hard-tab-lines))
-          (princ (format "  Soft tab percentage: %f (%d lines)\n"
-                         soft-tab-percentage soft-tab-lines))
+          (princ (format "  Hard tab percentage: %.2f%% (%d lines), %.2f%% superior to soft tabs (threshold %.2f%%)\n"
+                         (* 100.0 hard-tab-percentage) 
+                         hard-tab-lines 
+                         (- (* 100.0 (/ hard-tab-percentage soft-tab-percentage))
+                            100.0)
+                         dtrt-indent-min-hard-tab-superiority
+                         ))
+          (princ (format "  Soft tab percentage: %.2f%% (%d lines), %.2f%% superior to hard tabs (threshold %.2f%%)\n"
+                         (* 100.0 soft-tab-percentage) 
+                         soft-tab-lines
+                         (- (* 100.0 (/ soft-tab-percentage hard-tab-percentage))
+                            100.0)
+                         dtrt-indent-min-soft-tab-superiority))
 
           (princ "\nConclusion:\n\n")
 
