@@ -161,8 +161,6 @@ offset will be guessed for newly opened files and adjusted
 transparently."
   :global t :group 'dtrt-indent)
 
-(require 'cl)
-
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
@@ -724,76 +722,78 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                         dtrt-indent-max-merge-deviation)))))))
       (setq analysis-iterator (cdr analysis-iterator)))
 
-    (let* ((best-guess
-            (reduce (lambda (carry el) (or carry (unless (nth 3 el) el)))
-                    analysis :initial-value nil))
-           (second-best-guess
-            (reduce (lambda (carry el)
-                      (or carry (unless (or (eq el best-guess) (nth 3 el))
-                                  el)))
-                    analysis :initial-value nil))
-           (confidence
-            (if best-guess
-                (- (nth 1 best-guess)
-                   (if second-best-guess
-                       (* 2.0 (expt (/ (nth 1 second-best-guess) 2.0) 2))
-                     0))
-              0))
-           (total-lines (nth 1 histogram-and-total-lines))
-           (hard-tab-percentage (if (> total-lines 0)
-                                    (/ (float (nth 2 histogram-and-total-lines))
-                                       total-lines)
-                                  0))
-           (soft-tab-percentage (if (> total-lines 0)
-                                    (/ (float (nth 3 histogram-and-total-lines))
-                                       total-lines)
-                                  0))
-           (change-indent-tabs-mode)
-           (indent-tabs-mode-setting)
-           (rejected
-            (cond
-             ((null best-guess)
-              "no best guess")
-             ((< (* 100.0 (nth 1 best-guess))
-                 dtrt-indent-min-quality)
-              (format "best guess below minimum quality (%f < %f)"
-                      (* 100.0 (nth 1 best-guess))
-                      dtrt-indent-min-quality))
-             ((and second-best-guess
-                   (< (- (/ (* 100.0 (nth 1 best-guess))
-                            (nth 1 second-best-guess))
-                         100)
-                      dtrt-indent-min-indent-superiority))
-              "best guess not much better than second best guess"))))
+    (let (best-guess second-best-guess)
+      (dolist (guess analysis)
+        (cond
+         ((and (null best-guess)
+               (null (nth 3 guess)))
+          (setq best-guess guess))
+         ((and (null second-best-guess)
+               (null (nth 3 guess)))
+          (setq second-best-guess guess))))
 
-      (cond
-       ((or (= 0 hard-tab-percentage)
-            (>= (/ soft-tab-percentage
-                   hard-tab-percentage)
-                (+ 1.0 (/ dtrt-indent-min-soft-tab-superiority 100.0))))
-        (setq change-indent-tabs-mode t)
-        (setq indent-tabs-mode-setting nil))
+      (let* ((confidence
+      (if best-guess
+          (- (nth 1 best-guess)
+             (if second-best-guess
+                 (* 2.0 (expt (/ (nth 1 second-best-guess) 2.0) 2))
+               0))
+        0))
+             (total-lines (nth 1 histogram-and-total-lines))
+             (hard-tab-percentage (if (> total-lines 0)
+                                      (/ (float (nth 2 histogram-and-total-lines))
+                                         total-lines)
+                                    0))
+             (soft-tab-percentage (if (> total-lines 0)
+                                      (/ (float (nth 3 histogram-and-total-lines))
+                                         total-lines)
+                                    0))
+             (change-indent-tabs-mode)
+             (indent-tabs-mode-setting)
+             (rejected
+             (cond
+              ((null best-guess)
+               "no best guess")
+              ((< (* 100.0 (nth 1 best-guess))
+                  dtrt-indent-min-quality)
+               (format "best guess below minimum quality (%f < %f)"
+                       (* 100.0 (nth 1 best-guess))
+                       dtrt-indent-min-quality))
+              ((and second-best-guess
+                    (< (- (/ (* 100.0 (nth 1 best-guess))
+                             (nth 1 second-best-guess))
+                          100)
+                       dtrt-indent-min-indent-superiority))
+               "best guess not much better than second best guess"))))
 
-       ((or (= 0 soft-tab-percentage)
-            (>= (/ hard-tab-percentage
-                   soft-tab-percentage)
-                (+ 1.0 (/ dtrt-indent-min-hard-tab-superiority 100.0))))
-        (setq change-indent-tabs-mode t)
-        (setq indent-tabs-mode-setting t)))
+        (cond
+         ((or (= 0 hard-tab-percentage)
+              (>= (/ soft-tab-percentage
+                     hard-tab-percentage)
+                  (+ 1.0 (/ dtrt-indent-min-soft-tab-superiority 100.0))))
+         (setq change-indent-tabs-mode t)
+         (setq indent-tabs-mode-setting nil))
 
-      (list (cons :histogram (car histogram-and-total-lines))
-            (cons :total-lines total-lines)
-            (cons :analysis analysis)
-            (cons :best-guess best-guess)
-            (cons :second-best-guess second-best-guess)
-            (cons :hard-tab-lines (nth 2 histogram-and-total-lines) )
-            (cons :hard-tab-percentage hard-tab-percentage)
-            (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
-            (cons :soft-tab-percentage soft-tab-percentage)
-            (cons :change-indent-tabs-mode change-indent-tabs-mode)
-            (cons :indent-tabs-mode-setting indent-tabs-mode-setting)
-            (cons :rejected rejected)
-            (cons :confidence confidence)))))
+         ((or (= 0 soft-tab-percentage)
+              (>= (/ hard-tab-percentage
+                     soft-tab-percentage)
+                  (+ 1.0 (/ dtrt-indent-min-hard-tab-superiority 100.0))))
+         (setq change-indent-tabs-mode t)
+         (setq indent-tabs-mode-setting t)))
+
+        (list (cons :histogram (car histogram-and-total-lines))
+              (cons :total-lines total-lines)
+              (cons :analysis analysis)
+              (cons :best-guess best-guess)
+              (cons :second-best-guess second-best-guess)
+              (cons :hard-tab-lines (nth 2 histogram-and-total-lines) )
+              (cons :hard-tab-percentage hard-tab-percentage)
+              (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
+              (cons :soft-tab-percentage soft-tab-percentage)
+              (cons :change-indent-tabs-mode change-indent-tabs-mode)
+              (cons :indent-tabs-mode-setting indent-tabs-mode-setting)
+              (cons :rejected rejected)
+              (cons :confidence confidence))))))
 
 (defun dtrt-indent-try-set-offset ()
   "Try adjusting the current buffer's indentation offset."
