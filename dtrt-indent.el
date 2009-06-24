@@ -848,7 +848,7 @@ Indentation offset set with file variable; not adjusted")
                                indent-offset-variable
                                best-indent-offset
                                (if (>= dtrt-indent-verbosity 2)
-                                   (format " (%.0f%% confidence)"
+                                   (format " (%.0f%%%% confidence)"
                                            (* 100 confidence))
                                  "")))
                       (tabs-mode-info
