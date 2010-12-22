@@ -199,7 +199,7 @@ transparently."
 
     (shell      ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("[<][<]\\([^ \t]+\\)"   1   "^\\1"     nil)
+                ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)))
 
@@ -568,8 +568,9 @@ constrains the search to the current line."
                 (if (> (nth 1 matching-syntax-entry) 0)
                     (dtrt-indent--replace-in-string
                      (nth 2 matching-syntax-entry)
-                     "[\\][1]" (match-string-no-properties
-                                (1+ match-index)))
+                     "[\\][1]" (regexp-quote
+				(match-string-no-properties
+				 (1+ match-index))))
                   (nth 2 matching-syntax-entry))
                 (nth 4 matching-syntax-entry)
                 (when (nth 3 matching-syntax-entry) syntax-regex-pairs)
