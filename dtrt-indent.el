@@ -239,7 +239,7 @@ quote, for example.")
     (c++-mode        c/c++/java    c-basic-offset)       ; C++
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
-    (javascript-mode c/c++/java    c-basic-offset)       ; JavaScript
+    (js-mode         c/c++/java    js-indent-level)      ; JavaScript
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
