@@ -888,7 +888,7 @@ Indentation offset set with file variable; not adjusted")
   (interactive)
   (if (null dtrt-indent-original-indent)
       (message "No dtrt-indent override to undo in this buffer")
-    (let ((info 
+    (let ((info
            (concat
             (if (nth 2 dtrt-indent-original-indent)
                 (progn
@@ -950,12 +950,12 @@ Disable dtrt-indent if offset explicitly set."
     (setq global-mode-string
           (append global-mode-string '(dtrt-indent-mode-line-info))))
 
-(autoload 'dtrt-indent-diagnosis "dtrt-indent-diag" 
-  "Guess indentation for the current buffer and output diagnostics." 
+(autoload 'dtrt-indent-diagnosis "dtrt-indent-diag"
+  "Guess indentation for the current buffer and output diagnostics."
   t)
 
-(autoload 'dtrt-indent-highlight "dtrt-indent-diag" 
-  "Highlight non-excluded indentation in the current buffer." 
+(autoload 'dtrt-indent-highlight "dtrt-indent-diag"
+  "Highlight non-excluded indentation in the current buffer."
   t)
 
 (provide 'dtrt-indent)
