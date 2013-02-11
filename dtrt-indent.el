@@ -197,6 +197,10 @@ transparently."
 ;;              ("\\["                   0   "\\]"      t)
 ;;              ("{"                     0   "}"        t))
 
+    (css        ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
+                ("[/][*]"                0   "[*][/]"   nil))
+
     (shell      ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
                 ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
@@ -247,6 +251,7 @@ quote, for example.")
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
+    (css-mode        css           css-indent-offset)    ; CSS
     (pascal-mode     pascal        pascal-indent-level)) ; Pascal
    "A mapping from hook variables to language types.")
 
