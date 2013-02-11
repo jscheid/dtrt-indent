@@ -34,8 +34,8 @@
     (setq dtrt-indent-min-relevant-lines 3)
     (insert (cdr (assoc :buffer-contents args)))
     (let* ((language-and-variable
-            (cdr (assoc (cdr (assoc :mode args))
-                        dtrt-indent-hook-mapping-list)))
+            (cdr (dtrt-indent--search-hook-mapping
+                  (cdr (assoc :mode args)))))
            (result
             (dtrt-indent--analyze
              (dtrt-indent--calc-histogram
@@ -158,6 +158,20 @@ aa /*foo
         softspace-line")
    (:mode . c-mode)
    (:expected-tab-setting . undecided)
+   (:expected-offset . 8)))
+
+(define-derived-mode derived-c-mode c-mode "Derived-C"
+  "Derived-C for Test")
+
+(dtrt-indent-functional-test
+ '((:buffer-contents . "\
+	tabbed-line
+        softspace-line
+        softspace-line
+        softspace-line
+        softspace-line")
+   (:mode . derived-c-mode)
+   (:expected-tab-setting . soft)
    (:expected-offset . 8)))
 
 (when nil ;; disabled
