@@ -681,6 +681,12 @@ rejected: too few distinct matching offsets (%d required)"
            (t
             nil)))))
 
+(defun dtrt-indent--search-hook-mapping(mode)
+  "Search hook-mapping for MODE or its derived-mode-parent."
+  (if mode
+      (or (assoc mode dtrt-indent-hook-mapping-list)
+          (dtrt-indent--search-hook-mapping (get mode 'derived-mode-parent)))))
+
 (defun dtrt-indent--analyze (histogram-and-total-lines)
   "Analyze the histogram.
 
@@ -803,12 +809,8 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
 
 (defun dtrt-indent-try-set-offset ()
   "Try adjusting the current buffer's indentation offset."
-  (let ((language-and-variable
-         (cdr (assoc major-mode
-                     dtrt-indent-hook-mapping-list))))
-
+  (let ((language-and-variable (cdr (dtrt-indent--search-hook-mapping major-mode))))
     (when language-and-variable
-
       (let* ((result
               (dtrt-indent--analyze
                (dtrt-indent--calc-histogram
@@ -939,8 +941,7 @@ Note: killed buffer-local value for %s, restoring to default %d"
 
 Disable dtrt-indent if offset explicitly set."
   (cond
-   ((eql (nth 2 (assoc major-mode
-                       dtrt-indent-hook-mapping-list))
+   ((eql (nth 2 (dtrt-indent--search-hook-mapping major-mode))
          (ad-get-arg 0))
     (setq dtrt-indent-explicit-offset t))
    ((eql 'indent-tab-mode

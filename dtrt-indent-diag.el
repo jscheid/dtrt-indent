@@ -31,8 +31,7 @@
   (interactive)
   (require 'benchmark)
   (let ((language-and-variable
-         (cdr (assoc major-mode
-                     dtrt-indent-hook-mapping-list))))
+         (cdr (dtrt-indent--search-hook-mapping major-mode))))
 
     (with-output-to-temp-buffer "*dtrt-indent-debug*"
     (if (null language-and-variable)
