@@ -37,8 +37,7 @@
     (if (null language-and-variable)
         (princ (format "Major mode %s not supported by dtrt-indent" major-mode))
       (let* ((language-and-variable
-              (cdr (assoc major-mode
-                          dtrt-indent-hook-mapping-list)))
+              (cdr (dtrt-indent--search-hook-mapping major-mode)))
              result
              (time-for-analysis
               (benchmark-elapse
@@ -194,8 +193,7 @@ required)\n"
   "Highlight non-excluded indentation in the current buffer."
   (interactive)
   (let ((language-and-variable
-         (cdr (assoc major-mode
-                     dtrt-indent-hook-mapping-list))))
+         (cdr (dtrt-indent--search-hook-mapping major-mode))))
     (if (null language-and-variable)
         (message "Major mode %s not supported by dtrt-indent" major-mode)
       (save-buffer-state nil
