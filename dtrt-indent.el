@@ -247,6 +247,7 @@ quote, for example.")
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
+    (cperl-mode      perl          cperl-indent-level)   ; Perl
 ;;  (python-mode     python        py-indent-offset)     ; Python
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
