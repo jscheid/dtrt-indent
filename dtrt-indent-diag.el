@@ -26,10 +26,10 @@
 ;;-----------------------------------------------------------------
 ;; Diagnostic functions
 
+(require 'benchmark)
 (defun dtrt-indent-diagnosis ()
   "Guess indentation for the current buffer and output diagnostics."
   (interactive)
-  (require 'benchmark)
   (let ((language-and-variable
          (cdr (dtrt-indent--search-hook-mapping major-mode))))
 
