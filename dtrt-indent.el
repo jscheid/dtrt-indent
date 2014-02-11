@@ -1,9 +1,10 @@
 ;;; dtrt-indent.el --- Adapt to foreign indentation offsets
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
+;; Copyright (C) 2014 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Version: 0.2.0
+;; Version: 0.2.1
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -175,6 +176,13 @@ transparently."
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
+    (lua        ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("--"                    0   "$"        nil)
+                ("("                     0   ")"        t)
+                ("\\[\\(=+\\)\\["        1   "\\]\\1\\]"     nil)
+                ("{"                     0   "}"        t))
+
     (ruby       ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
                 ("#"                     0   "$"        nil)
@@ -267,6 +275,7 @@ quote, for example.")
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
     (js-mode         c/c++/java    js-indent-level)      ; JavaScript
+    (lua-mode        lua           lua-indent-level)     ; Lua
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
