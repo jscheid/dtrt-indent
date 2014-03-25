@@ -197,6 +197,27 @@ transparently."
 ;;              ("\\["                   0   "\\]"      t)
 ;;              ("{"                     0   "}"        t))
 
+    ;; The standard Erlang style is to indent code inside a block
+    ;; relative to the token that opened the block.  For example:
+    ;;
+    ;; bar(X) ->
+    ;;   {A, B} = case X of
+    ;;              true ->
+    ;;                {alpha, [beta,
+    ;;                         gamma]}
+    ;;            end.
+    ;;
+    ;; Thus it is best to ignore the code inside these block
+    ;; constructs when determining the indent offset.
+    (erlang     ("\""                    0   "\""       nil "\\.")
+                ("[<][<]\""              0   "\"[>][>]" nil)
+                ("%"                     0   "$"        nil)
+                ("{"                     0   "}"        t)
+		("\\["                   0   "\\]"      t)
+                ("("                     0   ")"        t)
+		("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
+                                         0   "\\bend\\b" t))
+
     (css        ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
                 ("[/][*]"                0   "[*][/]"   nil))
@@ -248,6 +269,7 @@ quote, for example.")
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
 ;;  (python-mode     python        py-indent-offset)     ; Python
+    (erlang-mode     erlang        erlang-indent-level)  ; Erlang
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
