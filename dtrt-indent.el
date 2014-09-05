@@ -269,7 +269,7 @@ prevent an escaped quote from being interpreted as the closing
 quote, for example.")
 
 (defvar dtrt-indent-hook-mapping-list
-;;   Mode            Hook                  Syntax        Variable
+;;   Mode            Syntax        Variable
   '((c-mode          c/c++/java    c-basic-offset)       ; C
     (c++-mode        c/c++/java    c-basic-offset)       ; C++
     (java-mode       c/c++/java    c-basic-offset)       ; Java
