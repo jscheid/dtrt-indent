@@ -67,6 +67,8 @@
               (cdr (assoc :best-guess result)))
              (second-best-guess
               (cdr (assoc :second-best-guess result)))
+             (rejected
+              (cdr (assoc :rejected result)))
              (confidence
               (cdr (assoc :confidence result))))
 
@@ -164,6 +166,7 @@ required)\n"
   Guessed offset %s with %.0f%% confidence.\n"
                          (nth 0 best-guess)
                          (* 100.0 confidence)))
+          (if rejected (princ (format "  Rejected: %s (threshold: %.0f%%)\n" rejected dtrt-indent-min-indent-superiority)))
           (princ (format "  Change indent-tab-setting: %s\n"
                          (if change-indent-tabs-mode
                              (format "yes, to %s" indent-tabs-mode-setting)
