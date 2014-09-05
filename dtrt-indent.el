@@ -275,6 +275,8 @@ quote, for example.")
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
     (js-mode         c/c++/java    js-indent-level)      ; JavaScript
+    (js3-mode        c/c++/java    js3-indent-level)     ; JavaScript-IDE
+    (json-mode       c/c++/java    js-indent-level)      ; JSON
     (lua-mode        lua           lua-indent-level)     ; Lua
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
