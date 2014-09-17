@@ -163,8 +163,8 @@ transparently."
   :global t :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
-  '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
+  '((c/c++/java ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
                 ("[/][*]"                0   "[*][/]"   nil)
                 ("[/][/]"                0   "$"        nil)
                 ("("                     0   ")"        t)
@@ -172,14 +172,16 @@ transparently."
 
     ;; Same as c/c++/java but ignore function call arguments, to cope with
     ;; modules defined entirely within a function call, e.g. AMD style
-    (javascript ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
+    (javascript ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
                 ("[/][*]"                0   "[*][/]"   nil)
                 ("[/][/]"                0   "$"        nil)
+                ;; FIXME: this pattern can match inside regexes
+                ;; (same for Perl (& Ruby?))
                 ("\\["                   0   "\\]"      t))
 
-    (perl       ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
+    (perl       ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
                 ("[#]"                   0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
@@ -234,8 +236,8 @@ transparently."
 		("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
                                          0   "\\bend\\b" t))
 
-    (css        ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
+    (css        ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
                 ("[/][*]"                0   "[*][/]"   nil))
 
     (shell      ("\""                    0   "\""       nil "\\.")
