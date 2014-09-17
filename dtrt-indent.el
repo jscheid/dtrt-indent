@@ -367,19 +367,15 @@ made on a small file - you might want to decrease it."
   :tag "Minimum Number Of Relevant Lines"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-max-relevant-lines 500
-  "*Maximum number of relevant lines to be considered in analysis.
+(defcustom dtrt-indent-max-lines 5000
+  "*Maximum number of lines to be considered in analysis.
 
 This setting is meant to prevent dtrt-indent from spending large
 amounts of time on analyzing large source files.  In general, the
 higher this setting, the more accurate the guess will be but the
-more time dtrt-indent will consume when opening files.  If you
-have a fast box you might want to consider increasing this
-number.  On the other hand, if you find that dtrt-indent
-introduces a noticable delay when opening files you might want
-to decrease it."
+more time dtrt-indent will consume when opening files."
   :type 'integer
-  :tag "Maximum Number Of Relevant Lines"
+  :tag "Maximum Number Of Lines"
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-min-quality 80.0
@@ -657,11 +653,13 @@ The histogram is calculated for the current buffer using LANGUAGE
 to determine which lines to exclude from the histogram."
   (let ((histogram (make-hash-table))
         (hard-tab-line-count 0)
-        (soft-tab-line-count 0))
+        (soft-tab-line-count 0)
+        (line-count 0))
 
     (dtrt-indent--for-each-indentation
      language
      (lambda (histogram-and-count)
+       (setq line-count (1+ line-count))
        (when (and (> (current-column) 0)
                   (not (looking-at "$"))
                   (or (not dtrt-indent-ignore-single-chars-flag)
@@ -677,8 +675,7 @@ to determine which lines to exclude from the histogram."
              (setq hard-tab-line-count (1+ hard-tab-line-count))
            (setq soft-tab-line-count (1+ soft-tab-line-count)))
          (setcdr histogram-and-count (1+ (cdr histogram-and-count))))
-       (< (cdr histogram-and-count)
-          dtrt-indent-max-relevant-lines))
+       (< line-count dtrt-indent-max-lines))
      (cons histogram 0))
     (let ((histogram-list '()) (total-lines 0))
       (maphash (lambda (key value)

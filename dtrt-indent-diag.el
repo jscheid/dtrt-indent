@@ -79,7 +79,7 @@
         (princ (format "Total relevant lines: %d out of %d (limit: %d)\n"
                        total-lines
                        (line-number-at-pos (point-max))
-                       dtrt-indent-max-relevant-lines))
+                       dtrt-indent-max-lines))
         (if (< total-lines
                dtrt-indent-min-relevant-lines)
             (princ
