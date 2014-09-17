@@ -170,6 +170,14 @@ transparently."
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
+    ;; Same as c/c++/java but ignore function call arguments, to cope with
+    ;; modules defined entirely within a function call, e.g. AMD style
+    (javascript ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
+                ("[/][*]"                0   "[*][/]"   nil)
+                ("[/][/]"                0   "$"        nil)
+                ("\\["                   0   "\\]"      t))
+
     (perl       ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
                 ("[#]"                   0   "$"        nil)
@@ -274,9 +282,9 @@ quote, for example.")
     (c++-mode        c/c++/java    c-basic-offset)       ; C++
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
-    (js-mode         c/c++/java    js-indent-level)      ; JavaScript
-    (js3-mode        c/c++/java    js3-indent-level)     ; JavaScript-IDE
-    (json-mode       c/c++/java    js-indent-level)      ; JSON
+    (js-mode         javascript    js-indent-level)      ; JavaScript
+    (js3-mode        javascript    js3-indent-level)     ; JavaScript-IDE
+    (json-mode       javascript    js-indent-level)      ; JSON
     (lua-mode        lua           lua-indent-level)     ; Lua
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
