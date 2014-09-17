@@ -297,7 +297,7 @@ treated as not fit for analysis and no guess will be made.
 
 @subsection Configuration settings used at this stage
 @code{dtrt-indent-min-relevant-lines},
-@code{dtrt-indent-max-relevant-lines},
+@code{dtrt-indent-max-lines},
 @code{dtrt-indent-ignore-single-chars-flag}
 
 @section Histogram Generation
@@ -341,13 +341,8 @@ Finally, @command{dtrt-indent} looks at the highest probability of all
 potential offsets; if that probablity is below a given threshold, the
 guess is deemed unreliable and no settings are changed.
 
-Otherwise, as an additional sanity check, @command{dtrt-indent} will
-compare the highest probability to the second-highest probability; if
-it is not significantly higher, it will be deemed unreliable as well.
-
 If the analysis yielded a best guess that exceeds the absolute
-threshold and the relative threshold when compared to the second-best
-guess, that guess is deemed reliable and the indentation setting will
+threshold, that guess is deemed reliable and the indentation setting will
 be modified.
 
 @subsection Configuration settings used at this stage

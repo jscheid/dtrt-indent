@@ -65,8 +65,6 @@
               (cdr (assoc :analysis result)))
              (best-guess
               (cdr (assoc :best-guess result)))
-             (second-best-guess
-              (cdr (assoc :second-best-guess result)))
              (rejected
               (cdr (assoc :rejected result)))
              (confidence
@@ -124,23 +122,6 @@ required)\n"
                    (nth 0 best-guess)
                    (* 100.0 (nth 1 best-guess))
                    dtrt-indent-min-quality))
-
-          (if second-best-guess
-              (progn
-                (princ
-                 (format "\
-  Second best guess is offset %d with %.2f%% matching lines\n"
-                         (nth 0 second-best-guess)
-                         (* 100.0 (nth 1 second-best-guess))))
-                (princ
-                 (format "\
-  Best guess is %.2f%% better than second best guess (%.2f%% \
-required)\n"
-                         (- (/ (* 100.0 (nth 1 best-guess))
-                               (nth 1 second-best-guess)) 100)
-                         dtrt-indent-min-indent-superiority)))
-            (princ
-             (format "  There is no second best guess\n")))
 
           (princ (format "  Hard tab percentage: %.2f%% (%d lines), \
 %.2f%% superior to soft tabs (threshold %.2f%%)\n"

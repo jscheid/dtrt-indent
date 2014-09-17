@@ -399,28 +399,6 @@ false negatives - i.e. guess-offset refuses to adjust the offset
   :tag "Minimum Number Of Matching Lines"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-min-indent-superiority 100.0
-  "*Minimum percentage the best guess needs to be better than second best.
-
-The percentage (0-100, but higher values than 100 are possible)
-that the number of lines matching the best guess must be higher
-than the number of lines matching the second best guess in order
-for dtrt-indent to adjust the offset.  For example, a value of
-100 means that there must be twice as many lines matching the
-best guess than the number of lines matching the second best
-guess.
-
-This check is in place to avoid a good guess to be accepted if
-there is another, similarly good guess, because in that situation
-there is ambiguity and no single reliable guess.  If you are
-getting false positives - i.e. dtrt-indent guesses the wrong
-offset - you might want to increase this setting.  On the other
-hand, if you are getting false negatives - i.e. dtrt-indent
-refuses to adjust the offset - you might want to decrease it."
-  :type 'float
-  :tag "Minimum Superiority Of Best Guess"
-  :group 'dtrt-indent)
-
 (defcustom dtrt-indent-min-soft-tab-superiority 300.0
   "*Minimum percentage soft-tab lines need to outnumber hard-tab ones.
 
@@ -779,22 +757,16 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                         dtrt-indent-max-merge-deviation)))))))
       (setq analysis-iterator (cdr analysis-iterator)))
 
-    (let (best-guess second-best-guess)
+    (let (best-guess)
       (dolist (guess analysis)
         (cond
          ((and (null best-guess)
                (null (nth 3 guess)))
-          (setq best-guess guess))
-         ((and (null second-best-guess)
-               (null (nth 3 guess)))
-          (setq second-best-guess guess))))
+          (setq best-guess guess))))
 
       (let* ((confidence
       (if best-guess
-          (- (nth 1 best-guess)
-             (if second-best-guess
-                 (* 2.0 (expt (/ (nth 1 second-best-guess) 2.0) 2))
-               0))
+          (- (nth 1 best-guess))
         0))
              (total-lines (nth 1 histogram-and-total-lines))
              (hard-tab-percentage (if (> total-lines 0)
@@ -815,13 +787,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                   dtrt-indent-min-quality)
                (format "best guess below minimum quality (%f < %f)"
                        (* 100.0 (nth 1 best-guess))
-                       dtrt-indent-min-quality))
-              ((and second-best-guess
-                    (< (- (/ (* 100.0 (nth 1 best-guess))
-                             (nth 1 second-best-guess))
-                          100)
-                       dtrt-indent-min-indent-superiority))
-               "best guess not much better than second best guess"))))
+                       dtrt-indent-min-quality)))))
 
         (cond
          ((or (= 0 hard-tab-percentage)
@@ -842,7 +808,6 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               (cons :total-lines total-lines)
               (cons :analysis analysis)
               (cons :best-guess best-guess)
-              (cons :second-best-guess second-best-guess)
               (cons :hard-tab-lines (nth 2 histogram-and-total-lines) )
               (cons :hard-tab-percentage hard-tab-percentage)
               (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
