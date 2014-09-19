@@ -165,8 +165,8 @@ transparently."
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("[/][*]"                0   "[*][/]"   nil)
-                ("[/][/]"                0   "$"        nil)
+                ("/\\*"                  0   "\\*/"     nil)
+                ("//"                    0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
@@ -174,15 +174,15 @@ transparently."
     ;; modules defined entirely within a function call, e.g. AMD style
     (javascript ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("[/][*]"                0   "[*][/]"   nil)
-                ("[/][/]"                0   "$"        nil)
-                ;; FIXME: this pattern can match inside regexes
-                ;; (same for Perl (& Ruby?))
+                ("/"                     0   "/"        nil "\\.")
+                ("/\\*"                  0   "\\*/"     nil)
+                ("//"                    0   "$"        nil)
                 ("\\["                   0   "\\]"      t))
 
     (perl       ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("[#]"                   0   "$"        nil)
+                ("/"                     0   "/"        nil "\\.")
+                ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
@@ -195,6 +195,7 @@ transparently."
 
     (ruby       ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
+                ("/"                     0   "/"        nil "\\.")
                 ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)
@@ -238,7 +239,7 @@ transparently."
 
     (css        ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("[/][*]"                0   "[*][/]"   nil))
+                ("/\\*"                  0   "\\*/"   nil))
 
     (shell      ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
