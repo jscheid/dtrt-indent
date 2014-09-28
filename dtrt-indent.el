@@ -226,7 +226,9 @@ transparently."
                 ("'"                     0   "'"        nil "\\.")
                 ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
                 ("("                     0   ")"        t)
-                ("\\["                   0   "\\]"      t)))
+                ("\\["                   0   "\\]"      t))
+
+    (default    ("\""                    0   "\""       nil "\\\\.")))
 
   "A list of syntax tables for supported languages.
 
@@ -274,7 +276,8 @@ quote, for example.")
     (ada-mode        ada           ada-indent)           ; Ada
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
     (css-mode        css           css-indent-offset)    ; CSS
-    (pascal-mode     pascal        pascal-indent-level)) ; Pascal
+    (pascal-mode     pascal        pascal-indent-level)  ; Pascal
+    (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
 
 ;;-----------------------------------------------------------------
@@ -707,7 +710,8 @@ rejected: too few distinct matching offsets (%d required)"
   "Search hook-mapping for MODE or its derived-mode-parent."
   (if mode
       (or (assoc mode dtrt-indent-hook-mapping-list)
-          (dtrt-indent--search-hook-mapping (get mode 'derived-mode-parent)))))
+          (dtrt-indent--search-hook-mapping (get mode 'derived-mode-parent))
+          (assoc 'default dtrt-indent-hook-mapping-list))))
 
 (defun dtrt-indent--analyze (histogram-and-total-lines)
   "Analyze the histogram.
