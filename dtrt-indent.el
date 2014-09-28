@@ -902,7 +902,9 @@ Indentation offset set with file variable; not adjusted")
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
-            (message "Note: %s not adjusted" indent-offset-variable))
+            (message "Note: %s not adjusted%s" indent-offset-variable
+                     (if (and rejected (>= dtrt-indent-verbosity 3))
+                         (format ": %s" rejected) "")))
           nil))))))
 
 (defun dtrt-indent-find-file-hook ()
