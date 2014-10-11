@@ -153,6 +153,9 @@
 ;; - Files for which the indentation offset cannot be guessed
 ;;   reliably.
 ;;
+;; - Files for which `dtrt-indent-explicit-offset' is true; this can be
+;; - used in `.dir-locals.el' files, for example.
+;;
 ;; Limitations:
 ;;
 ;; - dtrt-indent can't deal well with files that use variable
