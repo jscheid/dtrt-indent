@@ -32,7 +32,8 @@
 ;; This hooks into many major modes - c-mode, java-mode, shell-mode
 ;; and ruby-mode, to name but a few - and makes an educated guess on
 ;; which offset is appropriate by analyzing indentation levels in the
-;; file.
+;; file.  (Notably, it does not touch python-mode, which includes its own
+;; offset guessing.)
 ;;
 ;; Heuristics are used to estimate the proper indentation offset and
 ;; therefore this system is not infallible, however adjustments will
@@ -235,15 +236,6 @@ adjusted transparently."
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)
                 ("{"                     0   "}"        t))
-
-;;  python-mode comes with offset guessing
-;;  (python     ("\"\"\""                0   "\"\"\""   nil "\\.")
-;;              ("\""                    0   "\""       nil "\\.")
-;;              ("'"                     0   "'"        nil "\\.")
-;;              ("#"                     0   "$"        nil)
-;;              ("("                     0   ")"        t)
-;;              ("\\["                   0   "\\]"      t)
-;;              ("{"                     0   "}"        t))
 
     ;; The standard Erlang style is to indent code inside a block
     ;; relative to the token that opened the block.  For example:
