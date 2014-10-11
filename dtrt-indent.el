@@ -962,11 +962,6 @@ Note: killed buffer-local value for %s, restoring to default %d"
 ;;-----------------------------------------------------------------
 ;; Installation
 
-(defun dtrt-indent-unload-hook ()
-  "Unload dtrt-indent."
-  (dtrt-indent-mode 0))
-(add-hook 'dtrt-indent-unload-hook 'dtrt-indent-unload-hook)
-
 (defadvice hack-one-local-variable
   (before dtrt-indent-advise-hack-one-local-variable activate)
   "Adviced by dtrt-indent.
