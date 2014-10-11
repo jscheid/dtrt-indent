@@ -39,9 +39,7 @@
 ;; only be made if the guess is considered reliable.  This way it
 ;; should leave you off no worse than before.
 ;;
-;; To install,
-;;   (require 'dtrt-indent)
-;;   (dtrt-indent-mode 1)
+;; To install, M-x customize-variable dtrt-indent-mode, and turn it on.
 ;;
 ;; The default settings have been carefully chosen and tested to work
 ;; reliably on a wide range of source files. However, if it doesn't work
