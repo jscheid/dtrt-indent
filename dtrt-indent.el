@@ -51,42 +51,6 @@
 ;; There is more extensive information in the dtrt-indent info page
 ;; which you currently need to install manually.
 ;;
-;; Improvements over guess-offset.el:
-;;
-;; - Whereas guess-offset only worked for C, C++ and Java files,
-;;   dtrt-indent supports plenty of major modes (Shell script, Perl
-;;   and Ruby are worth mentioning) and is easier to adapt to other
-;;   languages.
-;;
-;; - dtrt-indent is now a minor mode and can be switched on and off,
-;;   both globally and locally (the latter using a File Variable).
-;;
-;; - dtrt-indent is more precise in analyzing the syntax of source
-;;   files, making its guess more accurate (it now ignores lines in
-;;   comments, multi-line expressions, here documents and the like.)
-;;
-;; - dtrt-indent stops analyzing a source file after a customizable
-;;   amount of lines, making it operate faster on large source files.
-;;
-;; - dtrt-indent leaves alone files that explicitly set the
-;;   indentation offset with a File Variable.
-;;
-;; - dtrt-indent comes with diagnostic functions to help you
-;;   understand what it does behind the scenes, adapt it to new
-;;   languages or fine-tune its parameters.
-;;
-;; - The name of the script has been changed to better reflect its
-;;   purpose.
-;;
-;; - The customization group is now a child of the convenience and
-;;   files groups instead of the tools group.
-;;
-;; - The customization variables are named more sensibly and are
-;;   better documented.
-;;
-;; - Documentation is improved and no longer confusingly refers to
-;;   "tab width" instead of "indentation offset".
-;;
 ;; Files not touched by dtrt-indent:
 ;;
 ;; - Files that specify the corresponding variable
@@ -126,27 +90,6 @@
 ;; - bulk (real world) tests
 ;; - functional tests
 ;; - unit tests
-
-;;; Change log:
-
-;; Revision 0.2.0 (2008-03-25)
-;; Major rewrite
-;; Name change from guess-offset.el to dtrt-indent.el
-;;
-;; Revision 0.1.2 (2007-02-02)
-;; Minor documentation cleanups
-;; Added link to cc-guess.el
-;; Applied two patches courtesy of Michael Ernst <mernst@alum.mit.edu>:
-;; (1) The problem is that you wrote
-;;     (- 1 bracket-level)
-;;     where you probably meant
-;;     (- bracket-level 1)
-;; (2) The documentation for `beginning-of-buffer' says
-;;     Don't use this command in Lisp programs!
-;;     (goto-char (point-min)) is faster and avoids clobbering the mark.
-;;
-;; Revision 0.1.1 (2003-??-??)
-;; Initial version
 
 ;;; Code:
 
