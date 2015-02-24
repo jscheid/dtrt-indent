@@ -317,7 +317,6 @@ quote, for example.")
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
     (cperl-mode      perl          cperl-indent-level)   ; Perl
-;;  (python-mode     python        py-indent-offset)     ; Python
     (erlang-mode     erlang        erlang-indent-level)  ; Erlang
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
