@@ -26,10 +26,10 @@
 ;;-----------------------------------------------------------------
 ;; Diagnostic functions
 
+(require 'benchmark)
 (defun dtrt-indent-diagnosis ()
   "Guess indentation for the current buffer and output diagnostics."
   (interactive)
-  (require 'benchmark)
   (let ((language-and-variable
          (cdr (dtrt-indent--search-hook-mapping major-mode))))
 
@@ -65,8 +65,8 @@
               (cdr (assoc :analysis result)))
              (best-guess
               (cdr (assoc :best-guess result)))
-             (second-best-guess
-              (cdr (assoc :second-best-guess result)))
+             (rejected
+              (cdr (assoc :rejected result)))
              (confidence
               (cdr (assoc :confidence result))))
 
@@ -77,7 +77,7 @@
         (princ (format "Total relevant lines: %d out of %d (limit: %d)\n"
                        total-lines
                        (line-number-at-pos (point-max))
-                       dtrt-indent-max-relevant-lines))
+                       dtrt-indent-max-lines))
         (if (< total-lines
                dtrt-indent-min-relevant-lines)
             (princ
@@ -123,23 +123,6 @@ required)\n"
                    (* 100.0 (nth 1 best-guess))
                    dtrt-indent-min-quality))
 
-          (if second-best-guess
-              (progn
-                (princ
-                 (format "\
-  Second best guess is offset %d with %.2f%% matching lines\n"
-                         (nth 0 second-best-guess)
-                         (* 100.0 (nth 1 second-best-guess))))
-                (princ
-                 (format "\
-  Best guess is %.2f%% better than second best guess (%.2f%% \
-required)\n"
-                         (- (/ (* 100.0 (nth 1 best-guess))
-                               (nth 1 second-best-guess)) 100)
-                         dtrt-indent-min-indent-superiority)))
-            (princ
-             (format "  There is no second best guess\n")))
-
           (princ (format "  Hard tab percentage: %.2f%% (%d lines), \
 %.2f%% superior to soft tabs (threshold %.2f%%)\n"
                          (* 100.0 hard-tab-percentage) 
@@ -164,6 +147,7 @@ required)\n"
   Guessed offset %s with %.0f%% confidence.\n"
                          (nth 0 best-guess)
                          (* 100.0 confidence)))
+          (if rejected (princ (format "  Rejected: %s (threshold: %.0f%%)\n" rejected dtrt-indent-min-indent-superiority)))
           (princ (format "  Change indent-tab-setting: %s\n"
                          (if change-indent-tabs-mode
                              (format "yes, to %s" indent-tabs-mode-setting)
