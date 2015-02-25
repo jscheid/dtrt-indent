@@ -124,8 +124,7 @@
 ;; threshold, that guess is deemed reliable and the indentation setting
 ;; will be modified.
 ;;
-;; Configuration settings used at this stage: `dtrt-indent-min-quality',
-;; `dtrt-indent-min-indent-superiority'
+;; Configuration settings used at this stage: `dtrt-indent-min-quality'.
 ;;
 ;; `indent-tabs-mode' Setting
 ;;
