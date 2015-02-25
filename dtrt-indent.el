@@ -264,6 +264,10 @@ adjusted transparently."
                 ("'"                     0   "'"        nil "\\.")
                 ("/\\*"                  0   "\\*/"   nil))
 
+    (sgml       ("[<]!\\[(CDATA|IGNORE|RCDATA)\\["
+                                         0   "\\]\\][>]"     nil)
+                ("[<]!--"                0   "[^-]--[>]"  nil))
+
     (shell      ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
                 ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
@@ -322,6 +326,8 @@ quote, for example.")
     (ada-mode        ada           ada-indent)           ; Ada
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
     (css-mode        css           css-indent-offset)    ; CSS
+    (sgml-mode       sgml          sgml-basic-offset)    ; SGML
+    (nxml-mode       sgml          nxml-child-indent)    ; XML
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
