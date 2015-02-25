@@ -310,6 +310,7 @@ quote, for example.")
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
     (js-mode         javascript    js-indent-level)      ; JavaScript
+    (js2-mode        javascript    js2-basic-offset)     ; JavaScript-IDE
     (js3-mode        javascript    js3-indent-level)     ; JavaScript-IDE
     (json-mode       javascript    js-indent-level)      ; JSON
     (lua-mode        lua           lua-indent-level)     ; Lua
