@@ -1,9 +1,10 @@
 ;;; dtrt-indent.el --- Adapt to foreign indentation offsets
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
+;; Copyright (C) 2014 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Version: 0.2.0
+;; Version: 0.2.1
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -23,68 +24,119 @@
 
 ;;; Commentary:
 
-;; A minor mode that guesses the indentation offset originally used
-;; for creating source code files and transparently adjusts the
-;; corresponding settings in Emacs, making it more convenient to edit
-;; foreign files.
+;; A minor mode that guesses the indentation offset and
+;; `indent-tabs-mode' originally used for creating source code files and
+;; transparently adjusts the corresponding settings in Emacs, making it
+;; more convenient to edit foreign files.
 ;;
 ;; This hooks into many major modes - c-mode, java-mode, shell-mode
 ;; and ruby-mode, to name but a few - and makes an educated guess on
 ;; which offset is appropriate by analyzing indentation levels in the
-;; file.
+;; file.  (Notably, it does not touch python-mode, which includes its own
+;; offset guessing.)
 ;;
 ;; Heuristics are used to estimate the proper indentation offset and
 ;; therefore this system is not infallible, however adjustments will
 ;; only be made if the guess is considered reliable.  This way it
 ;; should leave you off no worse than before.
 ;;
-;; To install,
-;;   (require 'dtrt-indent)
-;;   (dtrt-indent-mode 1)
+;; To install, M-x customize-variable dtrt-indent-mode, and turn it on.
 ;;
 ;; The default settings have been carefully chosen and tested to work
-;; reliably on a wide range of source files.  However, if it doesn't
-;; work for you they can be fine tuned using M-x customize-group
-;; dtrt-indent
+;; reliably on a wide range of source files. However, if it doesn't work
+;; for you they can be fine tuned using M-x customize-group dtrt-indent.
+;; You can use `dtrt-indent-diagnosis' to see dtrt-indent's
+;; measurements, `dtrt-indent-highlight' to show indentation that was
+;; considered,and `dtrt-indent-undo' to undo any changes it makes.
 ;;
-;; There is more extensive information in the dtrt-indent info page
-;; which you currently need to install manually.
 ;;
-;; Improvements over guess-offset.el:
+;; Heuristics
 ;;
-;; - Whereas guess-offset only worked for C, C++ and Java files,
-;;   dtrt-indent supports plenty of major modes (Shell script, Perl
-;;   and Ruby are worth mentioning) and is easier to adapt to other
-;;   languages.
+;; We now describe the inner workings of dtrt-indent and how it arrives
+;; at a conclusion on whether or not to change the indentation settings,
+;; and to which value.
 ;;
-;; - dtrt-indent is now a minor mode and can be switched on and off,
-;;   both globally and locally (the latter using a File Variable).
+;; Lines Analyzed
 ;;
-;; - dtrt-indent is more precise in analyzing the syntax of source
-;;   files, making its guess more accurate (it now ignores lines in
-;;   comments, multi-line expressions, here documents and the like.)
+;; In order to limit performance degradation due to the analysis, only a
+;; fixed number of lines will be analyzed.  If the size of the file is
+;; less than this number of lines, the whole file will be analyzed;
+;; otherwise, the given number of lines at the beginning of the file are
+;; analyzed.
 ;;
-;; - dtrt-indent stops analyzing a source file after a customizable
-;;   amount of lines, making it operate faster on large source files.
+;; Certain lines are ignored during analysis:
 ;;
-;; - dtrt-indent leaves alone files that explicitly set the
-;;   indentation offset with a File Variable.
+;; * Empty lines.
+;; * Lines that are not indented (indentation offset 0).
+;; * Lines that are the continuation of a multi-line comment or a
+;;   multi-line statement or expression.
+;; * Lines that only contain a single character can be ignored; by
+;;   default, however, they are included.
 ;;
-;; - dtrt-indent comes with diagnostic functions to help you
-;;   understand what it does behind the scenes, adapt it to new
-;;   languages or fine-tune its parameters.
+;; If, after ignoring any lines that are not eligible, the number of
+;; relevant lines is smaller than a given threshold then the file is
+;; treated as not fit for analysis and no guess will be made.
 ;;
-;; - The name of the script has been changed to better reflect its
-;;   purpose.
+;; Configuration settings used at this stage:
+;; `dtrt-indent-min-relevant-lines', `dtrt-indent-max-lines',
+;; `dtrt-indent-ignore-single-chars-flag'
 ;;
-;; - The customization group is now a child of the convenience and
-;;   files groups instead of the tools group.
+;; Histogram Generation
 ;;
-;; - The customization variables are named more sensibly and are
-;;   better documented.
+;; For the remaining lines - those eligible within the fixed range - a
+;; histogram is generated. The histogram informs dtrt-indent about how
+;; many lines are indented with one space, how many with two spaces, how
+;; many with three spaces, etc.
 ;;
-;; - Documentation is improved and no longer confusingly refers to
-;;   "tab width" instead of "indentation offset".
+;; Offset Assessment
+;;
+;; Using the histogram, dtrt-indent determines for each of the potential
+;; indentation offsets (by default, 2 through 8) how many lines are
+;; indented with a multiple of that offset.
+;;
+;; Offsets for which the histogram doesn't contain enough distinct
+;; indentations might be ignored; by default, however, a single
+;; indentation per offset is accepted.
+;;
+;; After this step, dtrt-indent has a map of probabilities for each of
+;; the potential offsets.
+;;
+;; Configuration settings used at this stage: `dtrt-indent-min-offset',
+;; `dtrt-indent-max-offset', `dtrt-indent-min-matching-indentations'
+;;
+;; Offset Merging
+;;
+;; As a next step, offsets that are a factor of another offset with
+;; similar probability are discarded; this is necessary because in a file
+;; that has been indented with, say, 4 spaces per level, 2 spaces per
+;; level could otherwise be wrongly guessed.
+;;
+;; Configuration settings used at this stage:
+;; `dtrt-indent-max-merge-deviation'
+;
+;; Final Evaluation
+;;
+;; Finally, dtrt-indent looks at the highest probability of all
+;; potential offsets; if that probablity is below a given threshold, the
+;; guess is deemed unreliable and no settings are changed.
+;;
+;; If the analysis yielded a best guess that exceeds the absolute
+;; threshold, that guess is deemed reliable and the indentation setting
+;; will be modified.
+;;
+;; Configuration settings used at this stage: `dtrt-indent-min-quality'.
+;;
+;; `indent-tabs-mode' Setting
+;;
+;; For determining hard vs. soft tabs, dtrt-indent counts the number of
+;; lines out of the eligible lines in the fixed segment that are
+;; indented using hard tabs, and the number of lines indented using
+;; spaces. If either count is significantly higher than the other count,
+;; `indent-tabs-mode' will be modified.
+;;
+;; Configuration settings used at this stage:
+;; `dtrt-indent-min-soft-tab-superiority',
+;; `dtrt-indent-min-hard-tab-superiority'
 ;;
 ;; Files not touched by dtrt-indent:
 ;;
@@ -99,6 +151,9 @@
 ;;
 ;; - Files for which the indentation offset cannot be guessed
 ;;   reliably.
+;;
+;; - Files for which `dtrt-indent-explicit-offset' is true; this can be
+;; - used in `.dir-locals.el' files, for example.
 ;;
 ;; Limitations:
 ;;
@@ -121,31 +176,9 @@
 ;; - verbose and diagnostics messages
 ;; - make sure variable documentation match their function
 ;; - make sure defaults are sensible
-;; - complete info page
 ;; - bulk (real world) tests
 ;; - functional tests
 ;; - unit tests
-
-;;; Change log:
-
-;; Revision 0.2.0 (2008-03-25)
-;; Major rewrite
-;; Name change from guess-offset.el to dtrt-indent.el
-;;
-;; Revision 0.1.2 (2007-02-02)
-;; Minor documentation cleanups
-;; Added link to cc-guess.el
-;; Applied two patches courtesy of Michael Ernst <mernst@alum.mit.edu>:
-;; (1) The problem is that you wrote
-;;     (- 1 bracket-level)
-;;     where you probably meant
-;;     (- bracket-level 1)
-;; (2) The documentation for `beginning-of-buffer' says
-;;     Don't use this command in Lisp programs!
-;;     (goto-char (point-min)) is faster and avoids clobbering the mark.
-;;
-;; Revision 0.1.1 (2003-??-??)
-;; Initial version
 
 ;;; Code:
 
@@ -156,27 +189,45 @@ With no argument, this command toggles the mode.  Non-null prefix
 argument turns on the mode.  Null prefix argument turns off the
 mode.
 
-When dtrt-indent mode is enabled, the proper indentation
-offset will be guessed for newly opened files and adjusted
-transparently."
+When dtrt-indent mode is enabled, the proper indentation offset
+and `indent-tabs-mode' will be guessed for newly opened files and
+adjusted transparently."
   :global t :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
-  '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
-                ("[/][*]"                0   "[*][/]"   nil)
-                ("[/][/]"                0   "$"        nil)
+  '((c/c++/java ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("/\\*"                  0   "\\*/"     nil)
+                ("//"                    0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
-    (perl       ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
-                ("[#]"                   0   "$"        nil)
+    ;; Same as c/c++/java but ignore function call arguments, to cope with
+    ;; modules defined entirely within a function call, e.g. AMD style
+    (javascript ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("/"                     0   "/"        nil "\\.")
+                ("/\\*"                  0   "\\*/"     nil)
+                ("//"                    0   "$"        nil)
+                ("\\["                   0   "\\]"      t))
+
+    (perl       ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("/"                     0   "/"        nil "\\.")
+                ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
+
+    (lua        ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("--"                    0   "$"        nil)
+                ("("                     0   ")"        t)
+                ("\\[\\(=+\\)\\["        1   "\\]\\1\\]"     nil)
+                ("{"                     0   "}"        t))
 
     (ruby       ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
+                ("/"                     0   "/"        nil "\\.")
                 ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)
@@ -188,18 +239,30 @@ transparently."
                 ("\\["                   0   "\\]"      t)
                 ("{"                     0   "}"        t))
 
-;;  python-mode comes with offset guessing
-;;  (python     ("\"\"\""                0   "\"\"\""   nil "\\.")
-;;              ("\""                    0   "\""       nil "\\.")
-;;              ("'"                     0   "'"        nil "\\.")
-;;              ("#"                     0   "$"        nil)
-;;              ("("                     0   ")"        t)
-;;              ("\\["                   0   "\\]"      t)
-;;              ("{"                     0   "}"        t))
+    ;; The standard Erlang style is to indent code inside a block
+    ;; relative to the token that opened the block.  For example:
+    ;;
+    ;; bar(X) ->
+    ;;   {A, B} = case X of
+    ;;              true ->
+    ;;                {alpha, [beta,
+    ;;                         gamma]}
+    ;;            end.
+    ;;
+    ;; Thus it is best to ignore the code inside these block
+    ;; constructs when determining the indent offset.
+    (erlang     ("\""                    0   "\""       nil "\\.")
+                ("[<][<]\""              0   "\"[>][>]" nil)
+                ("%"                     0   "$"        nil)
+                ("{"                     0   "}"        t)
+		("\\["                   0   "\\]"      t)
+                ("("                     0   ")"        t)
+		("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
+                                         0   "\\bend\\b" t))
 
-    (css        ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
-                ("[/][*]"                0   "[*][/]"   nil))
+    (css        ("\""                    0   "\""       nil "\\.")
+                ("'"                     0   "'"        nil "\\.")
+                ("/\\*"                  0   "\\*/"   nil))
 
     (sgml       ("[<]!\\[(CDATA|IGNORE|RCDATA)\\["
                                          0   "\\]\\][>]"     nil)
@@ -209,7 +272,9 @@ transparently."
                 ("'"                     0   "'"        nil "\\.")
                 ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
                 ("("                     0   ")"        t)
-                ("\\["                   0   "\\]"      t)))
+                ("\\["                   0   "\\]"      t))
+
+    (default    ("\""                    0   "\""       nil "\\\\.")))
 
   "A list of syntax tables for supported languages.
 
@@ -242,23 +307,29 @@ prevent an escaped quote from being interpreted as the closing
 quote, for example.")
 
 (defvar dtrt-indent-hook-mapping-list
-;;   Mode            Hook                  Syntax        Variable
+;;   Mode            Syntax        Variable
   '((c-mode          c/c++/java    c-basic-offset)       ; C
     (c++-mode        c/c++/java    c-basic-offset)       ; C++
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
-    (js-mode         c/c++/java    js-indent-level)      ; JavaScript
+    (js-mode         javascript    js-indent-level)      ; JavaScript
+    (js2-mode        javascript    js2-basic-offset)     ; JavaScript-IDE
+    (js3-mode        javascript    js3-indent-level)     ; JavaScript-IDE
+    (json-mode       javascript    js-indent-level)      ; JSON
+    (lua-mode        lua           lua-indent-level)     ; Lua
     (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
-;;  (python-mode     python        py-indent-offset)     ; Python
+    (cperl-mode      perl          cperl-indent-level)   ; Perl
+    (erlang-mode     erlang        erlang-indent-level)  ; Erlang
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
     (sh-mode         shell         sh-basic-offset)      ; Shell Script
     (css-mode        css           css-indent-offset)    ; CSS
     (sgml-mode       sgml          sgml-basic-offset)    ; SGML
     (nxml-mode       sgml          nxml-child-indent)    ; XML
-    (pascal-mode     pascal        pascal-indent-level)) ; Pascal
+    (pascal-mode     pascal        pascal-indent-level)  ; Pascal
+    (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
 
 ;;-----------------------------------------------------------------
@@ -328,19 +399,15 @@ made on a small file - you might want to decrease it."
   :tag "Minimum Number Of Relevant Lines"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-max-relevant-lines 500
-  "*Maximum number of relevant lines to be considered in analysis.
+(defcustom dtrt-indent-max-lines 5000
+  "*Maximum number of lines to be considered in analysis.
 
 This setting is meant to prevent dtrt-indent from spending large
 amounts of time on analyzing large source files.  In general, the
 higher this setting, the more accurate the guess will be but the
-more time dtrt-indent will consume when opening files.  If you
-have a fast box you might want to consider increasing this
-number.  On the other hand, if you find that dtrt-indent
-introduces a noticable delay when opening files you might want
-to decrease it."
+more time dtrt-indent will consume when opening files."
   :type 'integer
-  :tag "Maximum Number Of Relevant Lines"
+  :tag "Maximum Number Of Lines"
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-min-quality 80.0
@@ -360,28 +427,6 @@ false negatives - i.e. guess-offset refuses to adjust the offset
 - you might want to decrease it."
   :type 'float
   :tag "Minimum Number Of Matching Lines"
-  :group 'dtrt-indent)
-
-(defcustom dtrt-indent-min-indent-superiority 100.0
-  "*Minimum percentage the best guess needs to be better than second best.
-
-The percentage (0-100, but higher values than 100 are possible)
-that the number of lines matching the best guess must be higher
-than the number of lines matching the second best guess in order
-for dtrt-indent to adjust the offset.  For example, a value of
-100 means that there must be twice as many lines matching the
-best guess than the number of lines matching the second best
-guess.
-
-This check is in place to avoid a good guess to be accepted if
-there is another, similarly good guess, because in that situation
-there is ambiguity and no single reliable guess.  If you are
-getting false positives - i.e. dtrt-indent guesses the wrong
-offset - you might want to increase this setting.  On the other
-hand, if you are getting false negatives - i.e. dtrt-indent
-refuses to adjust the offset - you might want to decrease it."
-  :type 'float
-  :tag "Minimum Superiority Of Best Guess"
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-min-soft-tab-superiority 300.0
@@ -618,11 +663,13 @@ The histogram is calculated for the current buffer using LANGUAGE
 to determine which lines to exclude from the histogram."
   (let ((histogram (make-hash-table))
         (hard-tab-line-count 0)
-        (soft-tab-line-count 0))
+        (soft-tab-line-count 0)
+        (line-count 0))
 
     (dtrt-indent--for-each-indentation
      language
      (lambda (histogram-and-count)
+       (setq line-count (1+ line-count))
        (when (and (> (current-column) 0)
                   (not (looking-at "$"))
                   (or (not dtrt-indent-ignore-single-chars-flag)
@@ -638,8 +685,7 @@ to determine which lines to exclude from the histogram."
              (setq hard-tab-line-count (1+ hard-tab-line-count))
            (setq soft-tab-line-count (1+ soft-tab-line-count)))
          (setcdr histogram-and-count (1+ (cdr histogram-and-count))))
-       (< (cdr histogram-and-count)
-          dtrt-indent-max-relevant-lines))
+       (< line-count dtrt-indent-max-lines))
      (cons histogram 0))
     (let ((histogram-list '()) (total-lines 0))
       (maphash (lambda (key value)
@@ -691,7 +737,8 @@ rejected: too few distinct matching offsets (%d required)"
   "Search hook-mapping for MODE or its derived-mode-parent."
   (if mode
       (or (assoc mode dtrt-indent-hook-mapping-list)
-          (dtrt-indent--search-hook-mapping (get mode 'derived-mode-parent)))))
+          (dtrt-indent--search-hook-mapping (get mode 'derived-mode-parent))
+          (assoc 'default dtrt-indent-hook-mapping-list))))
 
 (defun dtrt-indent--analyze (histogram-and-total-lines)
   "Analyze the histogram.
@@ -740,22 +787,16 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                         dtrt-indent-max-merge-deviation)))))))
       (setq analysis-iterator (cdr analysis-iterator)))
 
-    (let (best-guess second-best-guess)
+    (let (best-guess)
       (dolist (guess analysis)
         (cond
          ((and (null best-guess)
                (null (nth 3 guess)))
-          (setq best-guess guess))
-         ((and (null second-best-guess)
-               (null (nth 3 guess)))
-          (setq second-best-guess guess))))
+          (setq best-guess guess))))
 
       (let* ((confidence
       (if best-guess
-          (- (nth 1 best-guess)
-             (if second-best-guess
-                 (* 2.0 (expt (/ (nth 1 second-best-guess) 2.0) 2))
-               0))
+          (- (nth 1 best-guess))
         0))
              (total-lines (nth 1 histogram-and-total-lines))
              (hard-tab-percentage (if (> total-lines 0)
@@ -776,13 +817,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                   dtrt-indent-min-quality)
                (format "best guess below minimum quality (%f < %f)"
                        (* 100.0 (nth 1 best-guess))
-                       dtrt-indent-min-quality))
-              ((and second-best-guess
-                    (< (- (/ (* 100.0 (nth 1 best-guess))
-                             (nth 1 second-best-guess))
-                          100)
-                       dtrt-indent-min-indent-superiority))
-               "best guess not much better than second best guess"))))
+                       dtrt-indent-min-quality)))))
 
         (cond
          ((or (= 0 hard-tab-percentage)
@@ -803,7 +838,6 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               (cons :total-lines total-lines)
               (cons :analysis analysis)
               (cons :best-guess best-guess)
-              (cons :second-best-guess second-best-guess)
               (cons :hard-tab-lines (nth 2 histogram-and-total-lines) )
               (cons :hard-tab-percentage hard-tab-percentage)
               (cons :soft-tab-lines (nth 3 histogram-and-total-lines) )
@@ -835,12 +869,13 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               (nth 0 best-guess))
              (indent-offset-variable
               (nth 1 language-and-variable)))
+
+        ; update indent-offset-variable?
         (cond
          ((and best-guess
                (not rejected)
-               (or (not (eq (symbol-value indent-offset-variable)
-                         best-indent-offset))
-                   (not (eq indent-tabs-mode indent-tabs-mode-setting))))
+               (not (eq (symbol-value indent-offset-variable)
+                         best-indent-offset)))
 
           (if dtrt-indent-explicit-offset
               (message "\
@@ -854,9 +889,7 @@ Indentation offset set with file variable; not adjusted")
               (setq dtrt-indent-original-indent
                     (list indent-offset-variable
                           (eval indent-offset-variable)
-                          (local-variable-p indent-offset-variable)
-                          indent-tabs-mode
-                          (local-variable-p indent-tabs-mode)))
+                          (local-variable-p indent-offset-variable)))
               (when (>= dtrt-indent-verbosity 1)
                 (let ((offset-info
                        (format "%s adjusted to %s%s"
@@ -865,25 +898,47 @@ Indentation offset set with file variable; not adjusted")
                                (if (>= dtrt-indent-verbosity 2)
                                    (format " (%.0f%%%% confidence)"
                                            (* 100 confidence))
-                                 "")))
-                      (tabs-mode-info
-                       (when (and change-indent-tabs-mode
-                                  (not (eql indent-tabs-mode-setting
-                                            indent-tabs-mode)))
-                         (format " and indent-tabs-mode adjusted to %s"
-                                 indent-tabs-mode-setting))))
-                  (message (concat "Note: " offset-info tabs-mode-info))))
+                                 ""))))
+                  (message (concat "Note: " offset-info))))
               (set (make-local-variable indent-offset-variable)
                    best-indent-offset)
-              (when change-indent-tabs-mode
-                (set (make-local-variable 'indent-tabs-mode)
-                     indent-tabs-mode-setting))
               (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
-            (message "Note: %s not adjusted" indent-offset-variable))
-          nil))))))
+            (message "Note: %s not adjusted%s" indent-offset-variable
+                     (if (and rejected (>= dtrt-indent-verbosity 3))
+                         (format ": %s" rejected) "")))
+          nil))
+
+        ; update indent-tabs-mode?
+        (cond
+         ((and change-indent-tabs-mode
+               (not (eq indent-tabs-mode indent-tabs-mode-setting)))
+          (when (>= dtrt-indent-verbosity 1)
+            (let ((tabs-mode-info
+                   (when (and change-indent-tabs-mode
+                              (not (eql indent-tabs-mode-setting
+                                        indent-tabs-mode)))
+                     (format "indent-tabs-mode adjusted to %s"
+                             indent-tabs-mode-setting))))
+              (message (concat "Note: " tabs-mode-info))))
+          ; backup indent-tabs-mode setting
+          (unless dtrt-indent-original-indent
+            (setq dtrt-indent-original-indent
+                  (list nil nil nil)))
+          (setq dtrt-indent-original-indent
+                (append dtrt-indent-original-indent
+                        (list indent-tabs-mode
+                              (local-variable-p indent-tabs-mode))))
+          ; actually adapt indent-tabs-mode
+          (set (make-local-variable 'indent-tabs-mode)
+               indent-tabs-mode-setting))
+         (t
+          (when (>= dtrt-indent-verbosity 2)
+            (message "Note: indent-tabs-mode not adjusted"))
+          nil))
+        ))))
 
 (defun dtrt-indent-find-file-hook ()
   "Try adjusting indentation offset when a file is loaded."
@@ -935,11 +990,6 @@ Note: killed buffer-local value for %s, restoring to default %d"
 
 ;;-----------------------------------------------------------------
 ;; Installation
-
-(defun dtrt-indent-unload-hook ()
-  "Unload dtrt-indent."
-  (dtrt-indent-mode 0))
-(add-hook 'dtrt-indent-unload-hook 'dtrt-indent-unload-hook)
 
 (defadvice hack-one-local-variable
   (before dtrt-indent-advise-hack-one-local-variable activate)
