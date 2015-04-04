@@ -250,12 +250,14 @@ adjusted transparently."
     ;; Thus it is best to ignore the code inside these block
     ;; constructs when determining the indent offset.
     (erlang     ("\""                    0   "\""       nil "\\.")
-                ("[<][<]\""              0   "\"[>][>]" nil)
+                ;; next pattern avoids error on git merge conflict lines
+                ("[<][<][<]"             0   "$"        nil)
+                ("[<][<]"                0   "[>][>]"   nil)
                 ("%"                     0   "$"        nil)
                 ("{"                     0   "}"        t)
-		("\\["                   0   "\\]"      t)
+                ("\\["                   0   "\\]"      t)
                 ("("                     0   ")"        t)
-		("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
+                ("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
                                          0   "\\bend\\b" t))
 
     (css        ("\""                    0   "\""       nil "\\.")
