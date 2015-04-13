@@ -820,6 +820,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                        dtrt-indent-min-quality)))))
 
         (cond
+         (rejected)
          ((or (= 0 hard-tab-percentage)
               (>= (/ soft-tab-percentage
                      hard-tab-percentage)
