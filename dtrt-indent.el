@@ -206,7 +206,6 @@ adjusted transparently."
     ;; modules defined entirely within a function call, e.g. AMD style
     (javascript ("\""                    0   "\""       nil "\\.")
                 ("'"                     0   "'"        nil "\\.")
-                ("/"                     0   "/"        nil "\\.")
                 ("/\\*"                  0   "\\*/"     nil)
                 ("//"                    0   "$"        nil)
                 ("\\["                   0   "\\]"      t))
