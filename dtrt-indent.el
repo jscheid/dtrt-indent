@@ -903,7 +903,7 @@ Indentation offset set with file variable; not adjusted")
                   (message (concat "Note: " offset-info))))
               (set (make-local-variable indent-offset-variable)
                    best-indent-offset)
-              (setq dtrt-indent-mode-line-info "  [dtrt-indent adjusted]")
+              (setq dtrt-indent-mode-line-info "[dtrt-indent] ")
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
