@@ -145,8 +145,6 @@
 ;;
 ;; - Files that specify dtrt-indent-mode: 0 as a File Variable.
 ;;
-;; - Files for which dtrt-indent-accept-file-function returns nil.
-;;
 ;; - Files with a major mode that dtrt-indent doesn't hook into.
 ;;
 ;; - Files for which the indentation offset cannot be guessed
@@ -525,18 +523,6 @@ a higher value than 8 should not be harmful, but source files
 using more than 8 spaces per indentation level are very rare."
   :type 'integer
   :tag "Maximum Guessed Indentation Offset"
-  :group 'dtrt-indent)
-
-(defcustom dtrt-indent-accept-file-function (lambda (filename) t)
-  "*Acceptor determining which files are analyzed.
-
-This function will be called for every file dtrt-indent would
-normally analyze with one argument, the file name.  Only if it
-returns a non-nil value analysis will be performed on the file.
-
-By default, all files are analyzed."
-  :type 'function
-  :tag "Analysed File Inclusion Function"
   :group 'dtrt-indent)
 
 (defvar dtrt-indent-original-indent)
