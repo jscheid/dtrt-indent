@@ -899,7 +899,7 @@ Indentation offset set with file variable; not adjusted")
             (when (or (not dtrt-indent-require-confirmation-flag)
                       (yes-or-no-p
                        (format "Do you want to adjust %s to %s for buffer %s? "
-                               indent-offset-variable
+                               indent-offset-names
                                best-indent-offset
                                (buffer-name))))
               (setq dtrt-indent-original-indent
@@ -909,20 +909,21 @@ Indentation offset set with file variable; not adjusted")
               (when (>= dtrt-indent-verbosity 1)
                 (let ((offset-info
                        (format "%s adjusted to %s%s"
-                               indent-offset-variable
+                               indent-offset-names
                                best-indent-offset
                                (if (>= dtrt-indent-verbosity 2)
                                    (format " (%.0f%%%% confidence)"
                                            (* 100 confidence))
                                  ""))))
                   (message (concat "Note: " offset-info))))
-              (set (make-local-variable indent-offset-variable)
-                   best-indent-offset)
+              (dolist (x indent-offset-variables)
+                (set (make-local-variable x)
+                     best-indent-offset))
               (setq dtrt-indent-mode-line-info "[dtrt-indent] ")
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
-            (message "Note: %s not adjusted%s" indent-offset-variable
+            (message "Note: %s not adjusted%s" indent-offset-variables
                      (if (and rejected (>= dtrt-indent-verbosity 3))
                          (format ": %s" rejected) "")))
           nil))
