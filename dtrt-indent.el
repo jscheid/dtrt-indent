@@ -871,7 +871,20 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
              (best-indent-offset
               (nth 0 best-guess))
              (indent-offset-variable
-              (nth 1 language-and-variable)))
+              (nth 1 language-and-variable))
+             (indent-offset-variables
+              (cons
+               indent-offset-variable
+               (remove nil
+                       (mapcar
+                        (lambda (x)
+                          (let ((mode (car x))
+                                (variable (cadr x)))
+                            (when (symbol-value mode) variable)))
+                        dtrt-indent-hook-generic-mapping-list))))
+             (indent-offset-names
+              (mapconcat (lambda (x) (format "%s" x))
+                         indent-offset-variables ", ")))
 
         ; update indent-offset-variable?
         (cond
