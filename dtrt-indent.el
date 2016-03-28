@@ -329,6 +329,22 @@ quote, for example.")
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
+
+(defvar dtrt-indent-hook-generic-mapping-list
+;;   Key variable    Value variable
+  '((evil-mode       evil-shift-width))  ; evil
+  "A mapping from hook variables to indentation variables.
+For each true key variable, its value variable is set to the same
+indentation offset as the variable in `dtrt-indent-hook-mapping-list'
+(e.g., `c-basic-offset').  Every pair in the list is processed.  To
+disable processing of any one pair, remove the pair from the list.
+Processing the list obeys `dtrt-indent-require-confirmation-flag'.
+
+The key can be any variable.  This list is used for cases such as when
+a minor-mode defines a variable to control its own indentation
+functionality (e.g. `evil-mode' using `evil-shift-width'), so the
+value variable must updated in addition to the syntax indentation
+variable.")
 
 ;;-----------------------------------------------------------------
 ;; Customization Definitions:
@@ -855,7 +871,20 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
              (best-indent-offset
               (nth 0 best-guess))
              (indent-offset-variable
-              (nth 1 language-and-variable)))
+              (nth 1 language-and-variable))
+             (indent-offset-variables
+              (cons
+               indent-offset-variable
+               (remove nil
+                       (mapcar
+                        (lambda (x)
+                          (let ((mode (car x))
+                                (variable (cadr x)))
+                            (when (symbol-value mode) variable)))
+                        dtrt-indent-hook-generic-mapping-list))))
+             (indent-offset-names
+              (mapconcat (lambda (x) (format "%s" x))
+                         indent-offset-variables ", ")))
 
         ; update indent-offset-variable?
         (cond
@@ -870,30 +899,32 @@ Indentation offset set with file variable; not adjusted")
             (when (or (not dtrt-indent-require-confirmation-flag)
                       (yes-or-no-p
                        (format "Do you want to adjust %s to %s for buffer %s? "
-                               indent-offset-variable
+                               indent-offset-names
                                best-indent-offset
                                (buffer-name))))
               (setq dtrt-indent-original-indent
-                    (list indent-offset-variable
-                          (eval indent-offset-variable)
-                          (local-variable-p indent-offset-variable)))
+                    (mapcar
+                     (lambda (x)
+                       (list x (symbol-value x) (local-variable-p x)))
+                     indent-offset-variables))
               (when (>= dtrt-indent-verbosity 1)
                 (let ((offset-info
                        (format "%s adjusted to %s%s"
-                               indent-offset-variable
+                               indent-offset-names
                                best-indent-offset
                                (if (>= dtrt-indent-verbosity 2)
                                    (format " (%.0f%%%% confidence)"
                                            (* 100 confidence))
                                  ""))))
                   (message (concat "Note: " offset-info))))
-              (set (make-local-variable indent-offset-variable)
-                   best-indent-offset)
+              (dolist (x indent-offset-variables)
+                (set (make-local-variable x)
+                     best-indent-offset))
               (setq dtrt-indent-mode-line-info "[dtrt-indent] ")
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
-            (message "Note: %s not adjusted%s" indent-offset-variable
+            (message "Note: %s not adjusted%s" indent-offset-variables
                      (if (and rejected (>= dtrt-indent-verbosity 3))
                          (format ": %s" rejected) "")))
           nil))
@@ -911,13 +942,11 @@ Indentation offset set with file variable; not adjusted")
                              indent-tabs-mode-setting))))
               (message (concat "Note: " tabs-mode-info))))
           ; backup indent-tabs-mode setting
-          (unless dtrt-indent-original-indent
-            (setq dtrt-indent-original-indent
-                  (list nil nil nil)))
           (setq dtrt-indent-original-indent
-                (append dtrt-indent-original-indent
-                        (list indent-tabs-mode
-                              (local-variable-p indent-tabs-mode))))
+                (cons
+                 (let ((x 'indent-tabs-mode))
+                   (list x (symbol-value x) (local-variable-p x)))
+                 dtrt-indent-original-indent))
           ; actually adapt indent-tabs-mode
           (set (make-local-variable 'indent-tabs-mode)
                indent-tabs-mode-setting))
@@ -945,32 +974,25 @@ Indentation offset set with file variable; not adjusted")
   (if (null dtrt-indent-original-indent)
       (message "No dtrt-indent override to undo in this buffer")
     (let ((info
-           (concat
-            (if (nth 2 dtrt-indent-original-indent)
-                (progn
-                  (set (nth 0 dtrt-indent-original-indent)
-                       (nth 1 dtrt-indent-original-indent))
-                  (when (>= dtrt-indent-verbosity 1)
-                    (format "\
-Note: restored original buffer-local value of %d for %s"
-                            (nth 1 dtrt-indent-original-indent)
-                            (nth 0 dtrt-indent-original-indent))))
-              (kill-local-variable (nth 0 dtrt-indent-original-indent))
-              (format "\
-Note: killed buffer-local value for %s, restoring to default %d"
-                      (nth 0 dtrt-indent-original-indent)
-                      (eval (nth 1 dtrt-indent-original-indent))))
-            (if (nth 4 dtrt-indent-original-indent)
-                (progn
-                  (setq indent-tabs-mode
-                        (nth 3 dtrt-indent-original-indent))
-                  (format "\
- and restored original buffer-local value of %s for indent-tabs-mode"
-                          (nth 3 dtrt-indent-original-indent)))
-              (kill-local-variable 'indent-tabs-mode)
-              (format "\
- and killed buffer-local value for indent-tabs-mode, restoring to default %s"
-                      indent-tabs-mode)))))
+           (mapconcat
+            (lambda (x)
+              ;; x is of the form `(variable value local-variable-p)'
+              (if (nth 2 x)
+                  ;; variable was originally buffer local
+                  (progn
+                    (set (nth 0 x)
+                         (nth 1 x))
+                    (when (>= dtrt-indent-verbosity 1)
+                      (format "Note: restored original buffer-local value of %s for %s"
+                              (nth 1 x)
+                              (nth 0 x))))
+                ;; variable was not originally buffer local
+                (kill-local-variable (nth 0 x))
+                (format "Note: killed buffer-local value for %s, restoring to default %s"
+                        (nth 0 x)
+                        (eval (nth 1 x)))))
+            dtrt-indent-original-indent
+            "\n")))
       (when (>= dtrt-indent-verbosity 1)
         (message info))
       (kill-local-variable 'dtrt-indent-original-indent))))
