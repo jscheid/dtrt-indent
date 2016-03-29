@@ -329,22 +329,6 @@ quote, for example.")
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
-
-(defvar dtrt-indent-hook-generic-mapping-list
-;;   Key variable    Value variable
-  '((evil-mode       evil-shift-width))  ; evil
-  "A mapping from hook variables to indentation variables.
-For each true key variable, its value variable is set to the same
-indentation offset as the variable in `dtrt-indent-hook-mapping-list'
-(e.g., `c-basic-offset').  Every pair in the list is processed.  To
-disable processing of any one pair, remove the pair from the list.
-Processing the list obeys `dtrt-indent-require-confirmation-flag'.
-
-The key can be any variable.  This list is used for cases such as when
-a minor-mode defines a variable to control its own indentation
-functionality (e.g. `evil-mode' using `evil-shift-width'), so the
-value variable must updated in addition to the syntax indentation
-variable.")
 
 ;;-----------------------------------------------------------------
 ;; Customization Definitions:
@@ -397,6 +381,25 @@ However, if you feel like it's doing things behind your back
 you should enable this setting."
   :type 'boolean
   :tag "Require Confirmation"
+  :group 'dtrt-indent)
+
+(defcustom dtrt-indent-hook-generic-mapping-list
+;;   Key variable    Value variable
+  '((evil-mode       evil-shift-width))  ; evil
+  "A mapping from hook variables to indentation variables.
+For each true key variable, its value variable is set to the same
+indentation offset as the variable in `dtrt-indent-hook-mapping-list'
+(e.g., `c-basic-offset').  Every pair in the list is processed.  To
+disable processing of any one pair, remove the pair from the list.
+Processing the list obeys `dtrt-indent-require-confirmation-flag'.
+
+The key can be any variable.  This list is used for cases such as when
+a minor-mode defines a variable to control its own indentation
+functionality (e.g. `evil-mode' using `evil-shift-width'), so the
+value variable must updated in addition to the syntax indentation
+variable."
+  :type '(alist :key-type variable
+                :value-type (group variable))
   :group 'dtrt-indent)
 
 (defcustom dtrt-indent-min-relevant-lines 2
@@ -880,7 +883,9 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                         (lambda (x)
                           (let ((mode (car x))
                                 (variable (cadr x)))
-                            (when (symbol-value mode) variable)))
+                            (when (and (boundp mode)
+                                       (symbol-value mode))
+                              variable)))
                         dtrt-indent-hook-generic-mapping-list))))
              (indent-offset-names
               (mapconcat (lambda (x) (format "%s" x))
