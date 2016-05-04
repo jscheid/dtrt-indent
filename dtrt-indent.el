@@ -800,9 +800,9 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
           (setq best-guess guess))))
 
       (let* ((confidence
-      (if best-guess
-          (- (nth 1 best-guess))
-        0))
+              (if best-guess
+                  (nth 1 best-guess)
+                0))
              (total-lines (nth 1 histogram-and-total-lines))
              (hard-tab-percentage (if (> total-lines 0)
                                       (/ (float (nth 2 histogram-and-total-lines))
