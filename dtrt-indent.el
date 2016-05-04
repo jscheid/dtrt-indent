@@ -322,7 +322,7 @@ quote, for example.")
     (erlang-mode     erlang        erlang-indent-level)  ; Erlang
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
-    (sh-mode         shell         sh-basic-offset)      ; Shell Script
+    (sh-mode         shell         sh-indentation)       ; Shell Script
     (css-mode        css           css-indent-offset)    ; CSS
     (sgml-mode       sgml          sgml-basic-offset)    ; SGML
     (nxml-mode       sgml          nxml-child-indent)    ; XML
