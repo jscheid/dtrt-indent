@@ -546,6 +546,12 @@ using more than 8 spaces per indentation level are very rare."
   :tag "Maximum Guessed Indentation Offset"
   :group 'dtrt-indent)
 
+(defcustom dtrt-indent-active-mode-line-info "[dtrt-indent] "
+  "*String to display in the modeline when dtrt-indent is active."
+  :type 'string
+  :tag "Modeline String Active Info"
+  :group 'dtrt-indent)
+
 (defvar dtrt-indent-original-indent)
 (make-variable-buffer-local
  'dtrt-indent-original-indent)
@@ -927,7 +933,7 @@ Indentation offset set with file variable; not adjusted")
               (dolist (x indent-offset-variables)
                 (set (make-local-variable x)
                      best-indent-offset))
-              (setq dtrt-indent-mode-line-info "[dtrt-indent] ")
+              (setq dtrt-indent-mode-line-info dtrt-indent-active-mode-line-info)
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
