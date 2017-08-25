@@ -322,13 +322,16 @@ quote, for example.")
     (perl-mode       perl          perl-indent-level)    ; Perl
     (cperl-mode      perl          cperl-indent-level)   ; Perl
     (erlang-mode     erlang        erlang-indent-level)  ; Erlang
-    (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (ada-mode        ada           ada-indent)           ; Ada
-    (sh-mode         shell         sh-indentation)       ; Shell Script
-    (css-mode        css           css-indent-offset)    ; CSS
     (sgml-mode       sgml          sgml-basic-offset)    ; SGML
     (nxml-mode       sgml          nxml-child-indent)    ; XML
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
+
+    ;; Modes that use SMIE if available
+    (sh-mode         shell         sh-basic-offset)      ; Shell Script
+    (ruby-mode       ruby          ruby-indent-level)    ; Ruby
+    (css-mode        css           css-indent-offset)    ; CSS
+
     (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
 
@@ -969,10 +972,14 @@ Indentation offset set with file variable; not adjusted")
           nil))
         ))))
 
+(defvar smie-grammar) ; in case smie is not available
 (defun dtrt-indent-find-file-hook ()
-  "Try adjusting indentation offset when a file is loaded."
+  "Try adjusting indentation offset when a file is loaded.
+If the current mode uses SMIE, use `smie-config-guess'."
   (when dtrt-indent-mode
-    (dtrt-indent-try-set-offset)))
+    (if (and (featurep 'smie) (not (eq smie-grammar 'unset)))
+        (smie-config-guess)
+      (dtrt-indent-try-set-offset))))
 
 (defun dtrt-indent-adapt ()
   "Try adjusting indentation settings for the current buffer."
