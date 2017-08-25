@@ -1,7 +1,7 @@
 ;;; dtrt-indent.el --- Adapt to foreign indentation offsets
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
-;; Copyright (C) 2014 Reuben Thomas
+;; Copyright (C) 2014-2017 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Version: 0.2.1
