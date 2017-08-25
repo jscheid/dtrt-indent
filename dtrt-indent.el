@@ -43,7 +43,7 @@
 ;; To install, M-x customize-variable dtrt-indent-mode, and turn it on.
 ;;
 ;; The default settings have been carefully chosen and tested to work
-;; reliably on a wide range of source files. However, if it doesn't work
+;; reliably on a wide range of source files.  However, if it doesn't work
 ;; for you they can be fine tuned using M-x customize-group dtrt-indent.
 ;; You can use `dtrt-indent-diagnosis' to see dtrt-indent's
 ;; measurements, `dtrt-indent-highlight' to show indentation that was
@@ -84,7 +84,7 @@
 ;; Histogram Generation
 ;;
 ;; For the remaining lines - those eligible within the fixed range - a
-;; histogram is generated. The histogram informs dtrt-indent about how
+;; histogram is generated.  The histogram informs dtrt-indent about how
 ;; many lines are indented with one space, how many with two spaces, how
 ;; many with three spaces, etc.
 ;;
@@ -131,7 +131,7 @@
 ;; For determining hard vs. soft tabs, dtrt-indent counts the number of
 ;; lines out of the eligible lines in the fixed segment that are
 ;; indented using hard tabs, and the number of lines indented using
-;; spaces. If either count is significantly higher than the other count,
+;; spaces.  If either count is significantly higher than the other count,
 ;; `indent-tabs-mode' will be modified.
 ;;
 ;; Configuration settings used at this stage:
@@ -746,7 +746,7 @@ rejected: too few distinct matching offsets (%d required)"
            (t
             nil)))))
 
-(defun dtrt-indent--search-hook-mapping(mode)
+(defun dtrt-indent--search-hook-mapping (mode)
   "Search hook-mapping for MODE or its derived-mode-parent."
   (if mode
       (or (assoc mode dtrt-indent-hook-mapping-list)
