@@ -27,13 +27,13 @@
 ;; A minor mode that guesses the indentation offset and
 ;; `indent-tabs-mode' originally used for creating source code files and
 ;; transparently adjusts the corresponding settings in Emacs, making it
-;; more convenient to edit foreign files.
+;; more convenient to edit others' files.
 ;;
-;; This hooks into many major modes - c-mode, java-mode, shell-mode
-;; and ruby-mode, to name but a few - and makes an educated guess on
-;; which offset is appropriate by analyzing indentation levels in the
-;; file.  (Notably, it does not touch python-mode, which includes its own
-;; offset guessing.)
+;; This hooks into many major modes - c-mode, java-mode and ruby-mode, to
+;; name but a few - and makes an educated guess on which offset is
+;; appropriate by analyzing indentation levels in the file.  Modes that have
+;; their own indentation offset guessing, such as python-mode, are not dealt
+;; with.  In modes based on SMIE, dtrt-indent delegates to smie-config-guess.
 ;;
 ;; Heuristics are used to estimate the proper indentation offset and
 ;; therefore this system is not infallible, however adjustments will
