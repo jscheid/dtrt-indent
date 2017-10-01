@@ -254,11 +254,12 @@ adjusted transparently."
                 ("[<][<][<]"             0   "$"        nil)
                 ("[<][<]"                0   "[>][>]"   nil)
                 ("%"                     0   "$"        nil)
+                ("^-"                    0   "\\."      nil)
                 ("{"                     0   "}"        t)
                 ("\\["                   0   "\\]"      t)
                 ("("                     0   ")"        t)
-                ("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
-                                         0   "\\bend\\b" t))
+                ("\\_<\\(?:begin\\|case\\|fun\\|if\\|receive\\|try\\)\\_>"
+                                         0   "\\_<end\\_>" t))
 
     (css        ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
