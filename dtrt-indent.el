@@ -193,8 +193,8 @@ adjusted transparently."
   :global t :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
-  '((c/c++/java ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
+  '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
                 ("/\\*"                  0   "\\*/"     nil)
                 ("//"                    0   "$"        nil)
                 ("("                     0   ")"        t)
@@ -202,36 +202,36 @@ adjusted transparently."
 
     ;; Same as c/c++/java but ignore function call arguments, to cope with
     ;; modules defined entirely within a function call, e.g. AMD style
-    (javascript ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
+    (javascript ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
                 ("/\\*"                  0   "\\*/"     nil)
                 ("//"                    0   "$"        nil)
                 ("/\\(.*\\)"             1   "\\1/"     nil)
                 ("\\["                   0   "\\]"      t))
 
-    (perl       ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
-                ("/"                     0   "/"        nil "\\.")
+    (perl       ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
+                ("/"                     0   "/"        nil "\\\\.")
                 ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
 
-    (lua        ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
+    (lua        ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
                 ("--"                    0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\[\\(=+\\)\\["        1   "\\]\\1\\]"     nil)
                 ("{"                     0   "}"        t))
 
-    (ruby       ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
-                ("/"                     0   "/"        nil "\\.")
+    (ruby       ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
+                ("/"                     0   "/"        nil "\\\\.")
                 ("#"                     0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)
                 ("{"                     0   "}"        t))
 
-    (ada        ("\""                    0   "\""       nil "\\.")
+    (ada        ("\""                    0   "\""       nil "\\\\.")
                 ("--"                    0   "$"        nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t)
@@ -249,7 +249,7 @@ adjusted transparently."
     ;;
     ;; Thus it is best to ignore the code inside these block
     ;; constructs when determining the indent offset.
-    (erlang     ("\""                    0   "\""       nil "\\.")
+    (erlang     ("\""                    0   "\""       nil "\\\\.")
                 ;; next pattern avoids error on git merge conflict lines
                 ("[<][<][<]"             0   "$"        nil)
                 ("[<][<]"                0   "[>][>]"   nil)
@@ -260,16 +260,16 @@ adjusted transparently."
                 ("\\b\\(begin\\|case\\|fun\\|if\\|receive\\|try\\)\\b"
                                          0   "\\bend\\b" t))
 
-    (css        ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
+    (css        ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
                 ("/\\*"                  0   "\\*/"   nil))
 
     (sgml       ("[<]!\\[(CDATA|IGNORE|RCDATA)\\["
                                          0   "\\]\\][>]"     nil)
                 ("[<]!--"                0   "[^-]--[>]"  nil))
 
-    (shell      ("\""                    0   "\""       nil "\\.")
-                ("'"                     0   "'"        nil "\\.")
+    (shell      ("\""                    0   "\""       nil "\\\\.")
+                ("'"                     0   "'"        nil "\\\\.")
                 ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
                 ("("                     0   ")"        t)
                 ("\\["                   0   "\\]"      t))
