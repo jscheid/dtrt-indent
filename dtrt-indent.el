@@ -656,21 +656,22 @@ from the process.  For each line not excluded, FUNC is called
 with USER-DATA as its argument and with point on the first
 non-whitespace character of the line."
   (save-excursion
-    (goto-char (point-min))
-    (while (and (re-search-forward "^[ \t]*" nil t)
-                (funcall func user-data)
-                (progn
-                  (dtrt-indent--skip-to-end-of-match
-                   nil
-                   nil
-                   (cdr
-                    (assoc language
-                           dtrt-indent-language-syntax-table))
-                   nil)
-                  (beginning-of-line)
-                  (let ((here (point)))
-                    (forward-line)
-                    (not (eq here (point)))))))))
+    (let ((case-fold-search nil))
+      (goto-char (point-min))
+      (while (and (re-search-forward "^[ \t]*" nil t)
+                  (funcall func user-data)
+                  (progn
+                    (dtrt-indent--skip-to-end-of-match
+                     nil
+                     nil
+                     (cdr
+                      (assoc language
+                             dtrt-indent-language-syntax-table))
+                     nil)
+                    (beginning-of-line)
+                    (let ((here (point)))
+                      (forward-line)
+                      (not (eq here (point))))))))))
 
 (defun dtrt-indent--calc-histogram (language)
   "Calculate an indendation histogram.
