@@ -3,7 +3,6 @@
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Version: 0.2.0
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
