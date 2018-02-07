@@ -190,7 +190,22 @@ mode.
 When dtrt-indent mode is enabled, the proper indentation offset
 and `indent-tabs-mode' will be guessed for newly opened files and
 adjusted transparently."
-  :lighter " dtrt-indent" :global t :group 'dtrt-indent)
+  :lighter " dtrt-indent"
+  :group 'dtrt-indent
+  (if dtrt-indent-mode
+      (if (and (featurep 'smie) (not (eq smie-grammar 'unset)))
+          (progn
+            (smie-config-guess)
+            (when dtrt-indent-run-after-smie
+              (dtrt-indent-try-set-offset)))
+        (dtrt-indent-try-set-offset))
+    (dtrt-indent-undo)))
+
+;;;###autoload
+(define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode
+  (lambda ()
+    (when (derived-mode-p 'prog-mode 'text-mode)
+      (dtrt-indent-mode))))
 
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
@@ -970,18 +985,6 @@ Indentation offset set with file variable; not adjusted")
           nil))
         ))))
 
-(defvar smie-grammar) ; in case smie is not available
-(defun dtrt-indent-find-file-hook ()
-  "Try adjusting indentation offset when a file is loaded.
-If the current mode uses SMIE, use `smie-config-guess'."
-  (when dtrt-indent-mode
-    (if (and (featurep 'smie) (not (eq smie-grammar 'unset)))
-        (progn
-          (smie-config-guess)
-          (when dtrt-indent-run-after-smie
-            (dtrt-indent-try-set-offset)))
-      (dtrt-indent-try-set-offset))))
-
 (defun dtrt-indent-adapt ()
   "Try adjusting indentation settings for the current buffer."
   (interactive)
@@ -1033,9 +1036,6 @@ Disable dtrt-indent if offset explicitly set."
    ((eql 'indent-tab-mode
          (ad-get-arg 0))
     (setq dtrt-indent-explicit-tab-mode t))))
-
-; Install global find-file-hook
-(add-hook 'find-file-hook 'dtrt-indent-find-file-hook)
 
 (autoload 'dtrt-indent-diagnosis "dtrt-indent-diag"
   "Guess indentation for the current buffer and output diagnostics."
