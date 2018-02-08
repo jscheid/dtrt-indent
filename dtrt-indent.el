@@ -269,12 +269,6 @@ adjusted transparently."
                                          0   "\\]\\][>]"     nil)
                 ("[<]!--"                0   "[^-]--[>]"  nil))
 
-    (shell      ("\""                    0   "\""       nil "\\\\.")
-                ("'"                     0   "'"        nil "\\\\.")
-                ("[<][<]\\\\?\\([^ \t]+\\)"   1   "^\\1"     nil)
-                ("("                     0   ")"        t)
-                ("\\["                   0   "\\]"      t))
-
     (default    ("\""                    0   "\""       nil "\\\\.")))
 
   "A list of syntax tables for supported languages.
@@ -329,7 +323,7 @@ quote, for example.")
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
 
     ;; Modes that use SMIE if available
-    (sh-mode         shell         sh-basic-offset)      ; Shell Script
+    (sh-mode         default       sh-basic-offset)      ; Shell Script
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (css-mode        css           css-indent-offset)    ; CSS
 
