@@ -190,7 +190,7 @@ mode.
 When dtrt-indent mode is enabled, the proper indentation offset
 and `indent-tabs-mode' will be guessed for newly opened files and
 adjusted transparently."
-  :global t :group 'dtrt-indent)
+  :lighter " dtrt-indent" :global t :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
@@ -544,19 +544,9 @@ using more than 8 spaces per indentation level are very rare."
   :tag "Maximum Guessed Indentation Offset"
   :group 'dtrt-indent)
 
-(defcustom dtrt-indent-active-mode-line-info "[dtrt-indent] "
-  "*String to display in the modeline when dtrt-indent is active."
-  :type 'string
-  :tag "Modeline String Active Info"
-  :group 'dtrt-indent)
-
 (defvar dtrt-indent-original-indent)
 (make-variable-buffer-local
  'dtrt-indent-original-indent)
-
-(defvar dtrt-indent-mode-line-info)
-(make-variable-buffer-local
- 'dtrt-indent-mode-line-info)
 
 (defvar dtrt-indent-explicit-offset)
 (make-variable-buffer-local
@@ -932,7 +922,6 @@ Indentation offset set with file variable; not adjusted")
               (dolist (x indent-offset-variables)
                 (set (make-local-variable x)
                      best-indent-offset))
-              (setq dtrt-indent-mode-line-info dtrt-indent-active-mode-line-info)
               best-indent-offset)))
          (t
           (when (>= dtrt-indent-verbosity 2)
@@ -1031,12 +1020,6 @@ Disable dtrt-indent if offset explicitly set."
 
 ; Install global find-file-hook
 (add-hook 'find-file-hook 'dtrt-indent-find-file-hook)
-
-; Customize mode line
-(or global-mode-string (setq global-mode-string '("")))
-(or (memq 'dtrt-indent-mode-line-info global-mode-string)
-    (setq global-mode-string
-          (append global-mode-string '(dtrt-indent-mode-line-info))))
 
 (autoload 'dtrt-indent-diagnosis "dtrt-indent-diag"
   "Guess indentation for the current buffer and output diagnostics."
