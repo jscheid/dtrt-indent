@@ -402,6 +402,19 @@ variable."
                 :value-type (group variable))
   :group 'dtrt-indent)
 
+(defcustom dtrt-indent-run-after-smie nil
+  "*Non-nil means to run dtrt-indent even in modes using SMIE.
+
+Normally, dtrt-indent will detect SMIE-based modes and delegate
+to `smie-config-guess'.  However, dtrt-indent configures some
+variables that SMIE does not (e.g. the contents of
+`dtrt-indent-hook-generic-mapping-list'), so you may want to run
+dtrt-indent even in SMIE-based modes.  You can do so by enabling
+this setting."
+  :type 'boolean
+  :tag "Run dtrt-indent After SMIE"
+  :group 'dtrt-indent)
+
 (defcustom dtrt-indent-min-relevant-lines 2
   "*Minimum number of relevant lines required for a guess to be made.
 
@@ -963,7 +976,10 @@ Indentation offset set with file variable; not adjusted")
 If the current mode uses SMIE, use `smie-config-guess'."
   (when dtrt-indent-mode
     (if (and (featurep 'smie) (not (eq smie-grammar 'unset)))
-        (smie-config-guess)
+        (progn
+          (smie-config-guess)
+          (when dtrt-indent-run-after-smie
+            (dtrt-indent-try-set-offset)))
       (dtrt-indent-try-set-offset))))
 
 (defun dtrt-indent-adapt ()
