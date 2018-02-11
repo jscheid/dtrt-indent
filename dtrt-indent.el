@@ -4,7 +4,7 @@
 ;; Copyright (C) 2014-2017 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Version: 0.4
+;; Version: 0.5
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
