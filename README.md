@@ -5,4 +5,5 @@ An Emacs minor mode that guesses the indentation offset originally used for crea
 See `dtrt-indent.el` for full documentation, including installation instructions.
 
 # Related work
-[vim-sleuth](https://github.com/tpope/vim-sleuth) provides similar functionally to some extent.
+
+[vim-sleuth](https://github.com/tpope/vim-sleuth) provides similar functionality for Vim.
