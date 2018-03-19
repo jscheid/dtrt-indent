@@ -1,10 +1,10 @@
 ;;; dtrt-indent.el --- Adapt to foreign indentation offsets
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
-;; Copyright (C) 2014-2017 Reuben Thomas
+;; Copyright (C) 2014-2018 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
-;; Version: 0.6
+;; Version: 0.7
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
