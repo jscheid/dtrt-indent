@@ -195,7 +195,7 @@ adjusted transparently."
   (if dtrt-indent-mode
       (if (and (featurep 'smie) (not (eq smie-grammar 'unset)))
           (progn
-            (smie-config-guess)
+            (when (null smie-config--buffer-local) (smie-config-guess))
             (when dtrt-indent-run-after-smie
               (dtrt-indent-try-set-offset)))
         (dtrt-indent-try-set-offset))
