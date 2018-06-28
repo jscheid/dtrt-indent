@@ -919,9 +919,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
         ; update indent-offset-variable?
         (cond
          ((and best-guess
-               (not rejected)
-               (not (eq (symbol-value indent-offset-variable)
-                         best-indent-offset)))
+               (not rejected))
 
           (if dtrt-indent-explicit-offset
               (message "\
