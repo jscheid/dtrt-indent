@@ -340,6 +340,7 @@ quote, for example.")
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
+    (enh-ruby-mode   ruby          enh-ruby-indent-level); Ruby
     (css-mode        css           css-indent-offset)    ; CSS
 
     (default         default       standard-indent))     ; default fallback
