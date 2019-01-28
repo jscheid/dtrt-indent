@@ -1032,7 +1032,7 @@ Disable dtrt-indent if offset explicitly set."
    ((eql (nth 2 (dtrt-indent--search-hook-mapping major-mode))
          (ad-get-arg 0))
     (setq dtrt-indent-explicit-offset t))
-   ((eql 'indent-tab-mode
+   ((eql 'indent-tabs-mode
          (ad-get-arg 0))
     (setq dtrt-indent-explicit-tab-mode t))))
 
