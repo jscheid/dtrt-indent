@@ -114,7 +114,7 @@
 ;;
 ;; Configuration settings used at this stage:
 ;; `dtrt-indent-max-merge-deviation'
-;
+;;
 ;; Final Evaluation
 ;;
 ;; Finally, dtrt-indent looks at the highest probability of all
@@ -153,6 +153,22 @@
 ;;
 ;; - Files for which `dtrt-indent-explicit-offset' is true; this can be
 ;; - used in `.dir-locals.el' files, for example.
+;;
+;; Overriding analysis on a file or directory basis
+;;
+;; Some local variables, as set in a file comment, .dir-locals.el,
+;; .dir-locals-2.el or using `dir-locals-set-class-variables'
+;; can be used to override dtrt-indent behavior.
+;;
+;; If the local variable `dtrt-indent-force-offset' is set, this will override
+;; the offset found from analysis.  This will not disable any other processing
+;; such as setting related variables.
+;;
+;; This differs from specifying particular variables e.g. c-basic-offset,
+;; or `dtrt-indent-explicit-offset' which disable setting any related variables.
+;;
+;; If the local variable `indent-tabs-mode' is set, this will be used
+;; for the value of indent-tabs-mode instead of the value determined from analysis.
 ;;
 ;; Limitations:
 ;;
@@ -591,6 +607,9 @@ using more than 8 spaces per indentation level are very rare."
 (make-variable-buffer-local
  'dtrt-indent-explicit-tab-mode)
 
+(defvar dtrt-indent-force-offset)
+(make-variable-buffer-local 'dtrt-indent-force-offset)
+
 (defun dtrt-indent--replace-in-string (haystack
                                         needle-regexp
                                         replacement)
@@ -904,7 +923,8 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
              (indent-tabs-mode-setting
               (cdr (assoc :indent-tabs-mode-setting result)))
              (best-indent-offset
-              (nth 0 best-guess))
+              (or dtrt-indent-force-offset
+                  (nth 0 best-guess)))
              (indent-offset-variable
               (nth 1 language-and-variable))
              (indent-offset-variables
@@ -945,9 +965,12 @@ Indentation offset set with file variable; not adjusted")
                      indent-offset-variables))
               (when (>= dtrt-indent-verbosity 1)
                 (let ((offset-info
-                       (format "%s adjusted to %s%s"
+                       (format "%s adjusted to %s%s%s"
                                indent-offset-names
                                best-indent-offset
+                               (if dtrt-indent-force-offset
+                                   " [forced]"
+                                 "")
                                (if (>= dtrt-indent-verbosity 2)
                                    (format " (%.0f%%%% confidence)"
                                            (* 100 confidence))
