@@ -915,8 +915,9 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                         (lambda (x)
                           (let ((mode (car x))
                                 (variable (cadr x)))
-                            (when (and (boundp mode)
-                                       (symbol-value mode))
+                            (when (or (and (boundp mode)
+                                           (symbol-value mode))
+                                      (derived-mode-p mode))
                               variable)))
                         dtrt-indent-hook-generic-mapping-list))))
              (indent-offset-names
