@@ -991,23 +991,25 @@ Indentation offset set with file variable; not adjusted")
         (cond
          ((and change-indent-tabs-mode
                (not (eq indent-tabs-mode indent-tabs-mode-setting)))
-          (when (>= dtrt-indent-verbosity 1)
-            (let ((tabs-mode-info
-                   (when (and change-indent-tabs-mode
-                              (not (eql indent-tabs-mode-setting
-                                        indent-tabs-mode)))
-                     (format "indent-tabs-mode adjusted to %s"
-                             indent-tabs-mode-setting))))
-              (message (concat "Note: " tabs-mode-info))))
-          ; backup indent-tabs-mode setting
-          (setq dtrt-indent-original-indent
-                (cons
-                 (let ((x 'indent-tabs-mode))
-                   (list x (symbol-value x) (local-variable-p x)))
-                 dtrt-indent-original-indent))
-          ; actually adapt indent-tabs-mode
-          (set (make-local-variable 'indent-tabs-mode)
-               indent-tabs-mode-setting))
+          (if dtrt-indent-explicit-tab-mode
+              (message "File variable indent-tabs-mode used; no adjustment done");
+            (when (>= dtrt-indent-verbosity 1)
+              (let ((tabs-mode-info
+                     (when (and change-indent-tabs-mode
+                                (not (eql indent-tabs-mode-setting
+                                          indent-tabs-mode)))
+                       (format "indent-tabs-mode adjusted to %s"
+                               indent-tabs-mode-setting))))
+                (message (concat "Note: " tabs-mode-info))))
+                                        ; backup indent-tabs-mode setting
+            (setq dtrt-indent-original-indent
+                  (cons
+                   (let ((x 'indent-tabs-mode))
+                     (list x (symbol-value x) (local-variable-p x)))
+                   dtrt-indent-original-indent))
+                                        ; actually adapt indent-tabs-mode
+            (set (make-local-variable 'indent-tabs-mode)
+                 indent-tabs-mode-setting)))
          (t
           (when (>= dtrt-indent-verbosity 2)
             (message "Note: indent-tabs-mode not adjusted"))
