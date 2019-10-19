@@ -343,6 +343,7 @@ quote, for example.")
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
     (enh-ruby-mode   ruby          enh-ruby-indent-level); Ruby
     (css-mode        css           css-indent-offset)    ; CSS
+    (rust-mode       default       rust-indent-offset)   ; Rust
 
     (default         default       standard-indent))     ; default fallback
    "A mapping from hook variables to language types.")
