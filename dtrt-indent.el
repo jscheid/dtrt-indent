@@ -344,8 +344,8 @@ quote, for example.")
     (enh-ruby-mode   ruby          enh-ruby-indent-level); Ruby
     (crystal-mode    ruby          crystal-indent-level) ; Crystal (Ruby)
     (css-mode        css           css-indent-offset)    ; CSS
-    (rust-mode       default       rust-indent-offset)   ; Rust
-    (rustic-mode     default       rustic-indent-offset) ; Rust
+    (rust-mode       c/c++/java    rust-indent-offset)   ; Rust
+    (rustic-mode     c/c++/java    rustic-indent-offset) ; Rust
     (scala-mode      c/c++/java    scala-indent:step)    ; Scala
 
     (default         default       standard-indent))     ; default fallback
