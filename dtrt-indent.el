@@ -321,6 +321,7 @@ quote, for example.")
 ;;   Mode            Syntax        Variable
   '((c-mode          c/c++/java    c-basic-offset)       ; C
     (c++-mode        c/c++/java    c-basic-offset)       ; C++
+    (d-mode          c/c++/java    c-basic-offset)       ; D
     (java-mode       c/c++/java    c-basic-offset)       ; Java
     (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
     (js-mode         javascript    js-indent-level)      ; JavaScript
