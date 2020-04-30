@@ -333,6 +333,7 @@ quote, for example.")
     (php-mode        c/c++/java    c-basic-offset)       ; PHP
     (perl-mode       perl          perl-indent-level)    ; Perl
     (cperl-mode      perl          cperl-indent-level)   ; Perl
+    (raku-mode       perl          raku-indent-offset)   ; Perl6/Raku
     (erlang-mode     erlang        erlang-indent-level)  ; Erlang
     (ada-mode        ada           ada-indent)           ; Ada
     (sgml-mode       sgml          sgml-basic-offset)    ; SGML
