@@ -340,6 +340,7 @@ quote, for example.")
     (nxml-mode       sgml          nxml-child-indent)    ; XML
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (typescript-mode javascript    typescript-indent-level) ; Typescript
+    (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
