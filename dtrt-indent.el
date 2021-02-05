@@ -205,7 +205,9 @@ adjusted transparently."
 ;;;###autoload
 (define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode
   (lambda ()
-    (when (derived-mode-p 'prog-mode 'text-mode)
+    ;; javascript-mode is an alias for js-mode, so derived-mode-p does not
+    ;; detect it is derived from 'prog-mode (Emacs bug #46331)
+    (when (derived-mode-p 'prog-mode 'text-mode 'javascript-mode)
       (dtrt-indent-mode))))
 
 (defvar dtrt-indent-language-syntax-table
