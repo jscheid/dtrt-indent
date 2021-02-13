@@ -343,6 +343,7 @@ quote, for example.")
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (typescript-mode javascript    typescript-indent-level) ; Typescript
     (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
+    (plantuml-mode   default       plantuml-indent-level) ; PlantUML
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
