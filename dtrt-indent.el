@@ -287,6 +287,10 @@ adjusted transparently."
                                          0   "\\]\\][>]"     nil)
                 ("[<]!--"                0   "[^-]--[>]"  nil))
 
+    (cmake      ("\""                    0   "\""        nil "\\\\.")
+                ("#\\[\\(=*\\)\\["       1   "\\]\\1\\]" nil)
+                ("#"                     0   "$"         nil))
+
     (default    ("\""                    0   "\""       nil "\\\\.")))
 
   "A list of syntax tables for supported languages.
@@ -344,6 +348,7 @@ quote, for example.")
     (typescript-mode javascript    typescript-indent-level) ; Typescript
     (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
     (plantuml-mode   default       plantuml-indent-level) ; PlantUML
+    (cmake-mode      cmake         cmake-tab-width)       ; CMake
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
