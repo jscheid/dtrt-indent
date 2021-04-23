@@ -348,6 +348,7 @@ quote, for example.")
     (typescript-mode javascript    typescript-indent-level) ; Typescript
     (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
     (plantuml-mode   default       plantuml-indent-level) ; PlantUML
+    (pug-mode        default       pug-tab-width)         ; Pug
     (cmake-mode      cmake         cmake-tab-width)       ; CMake
 
     ;; Modes that use SMIE if available
