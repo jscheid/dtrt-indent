@@ -10,7 +10,7 @@ environment:
     VERBOSE: 1 # Get test logs in output
 
 init:
-  - sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y install emacs
+  - sudo apt-get update && sudo apt-get -y install emacs
 
 build_script:
   - emacs -Q --batch --load dtrt-indent.el --load dtrt-indent-test.el
