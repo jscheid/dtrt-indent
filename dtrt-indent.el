@@ -344,6 +344,10 @@ quote, for example.")
     (ada-mode        ada           ada-indent)           ; Ada
     (sgml-mode       sgml          sgml-basic-offset)    ; SGML
     (nxml-mode       sgml          nxml-child-indent)    ; XML
+    (web-mode        sgml          (web-mode-markup-indent-offset
+                                    web-mode-code-indent-offset
+                                    web-mode-sql-indent-offset
+                                    web-mode-css-indent-offset)) ; HTML
     (pascal-mode     pascal        pascal-indent-level)  ; Pascal
     (typescript-mode javascript    typescript-indent-level) ; Typescript
     (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
@@ -917,11 +921,12 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
               (cdr (assoc :indent-tabs-mode-setting result)))
              (best-indent-offset
               (nth 0 best-guess))
-             (indent-offset-variable
-              (nth 1 language-and-variable))
+             (indent-offset-mode-variables
+              (let ((v (nth 1 language-and-variable)))
+                (if (listp v) v (list v))))
              (indent-offset-variables
-              (cons
-               indent-offset-variable
+              (append
+               indent-offset-mode-variables
                (remove nil
                        (mapcar
                         (lambda (x)
