@@ -41,7 +41,8 @@
 ;; only be made if the guess is considered reliable.  This way it
 ;; should leave you off no worse than before.
 ;;
-;; To install, M-x customize-variable dtrt-indent-mode, and turn it on.
+;; To install, M-x customize-group dtrt-indent-global, and turn on "Dtrt
+;; Indent Global Mode".
 ;;
 ;; The default settings have been carefully chosen and tested to work
 ;; reliably on a wide range of source files.  However, if it doesn't work
@@ -200,6 +201,8 @@ adjusted transparently."
             (when dtrt-indent-run-after-smie
               (dtrt-indent-try-set-offset)))
         (dtrt-indent-try-set-offset))
+        ;; (unless (and (featurep 'editorconfig) editorconfig-mode)
+        ;;   (dtrt-indent-try-set-offset)))
     (dtrt-indent-undo)))
 
 ;;;###autoload
