@@ -354,6 +354,7 @@ quote, for example.")
     (plantuml-mode   default       plantuml-indent-level) ; PlantUML
     (pug-mode        default       pug-tab-width)         ; Pug
     (cmake-mode      cmake         cmake-tab-width)       ; CMake
+    (xquery-mode     sgml          xquery-mode-indent-width) ; XQuery
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
