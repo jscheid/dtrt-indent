@@ -358,6 +358,7 @@ quote, for example.")
     (pug-mode        default       pug-tab-width)         ; Pug
     (cmake-mode      cmake         cmake-tab-width)       ; CMake
     (xquery-mode     sgml          xquery-mode-indent-width) ; XQuery
+    (vhdl-mode       default       vhdl-basic-offset) ; VHDL
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
