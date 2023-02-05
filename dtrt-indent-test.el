@@ -71,7 +71,7 @@
         (assert (eq change-indent-tabs-mode nil))))
       (if expected-offset
           (assert (eq nil rejected) t)
-        (assert (not (eq nil rejected)) t))          
+        (assert (not (eq nil rejected)) t))
       (assert (eq expected-offset
                   best-indent-offset) t))))
 
