@@ -69,11 +69,11 @@
         (cl-assert (eq indent-tabs-mode-setting nil)))
        ((eq expected-tab-setting 'undecided)
         (cl-assert (eq change-indent-tabs-mode nil))))
-      (if expected-offset
-          (cl-assert (eq nil rejected) t)
-        (cl-assert (not (eq nil rejected)) t))
-      (cl-assert (eq expected-offset
-                  best-indent-offset) t))))
+      (if (not expected-offset)
+          (cl-assert (not (eq nil rejected)) t)
+        (cl-assert (eq nil rejected) t)
+        (cl-assert (eq expected-offset
+                       best-indent-offset) t)))))
 
 (defun dtrt-indent-test-rec-directory-files
   (directory filename-pattern function)
