@@ -858,6 +858,8 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                   (nth 1 best-guess)
                 0))
              (total-lines (nth 1 histogram-and-total-lines))
+             (enough-relevant-lines
+              (>= total-lines dtrt-indent-min-relevant-lines))
              (hard-tab-percentage (if (> total-lines 0)
                                       (/ (float (nth 2 histogram-and-total-lines))
                                          total-lines)
@@ -876,10 +878,13 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
                   dtrt-indent-min-quality)
                (format "best guess below minimum quality (%f < %f)"
                        (* 100.0 (nth 1 best-guess))
-                       dtrt-indent-min-quality)))))
+                       dtrt-indent-min-quality))
+              ((not enough-relevant-lines)
+               (format "not enough relevant lines (%d required)"
+                       dtrt-indent-min-relevant-lines)))))
 
         (cond
-         (rejected)
+         ((not enough-relevant-lines))
          ((or (= 0 hard-tab-percentage)
               (>= (/ soft-tab-percentage
                      hard-tab-percentage)
