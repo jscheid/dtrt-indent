@@ -20,7 +20,7 @@
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 ;; Floor, Boston, MA 02110-1301 USA
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (require 'dtrt-indent)
 
@@ -62,17 +62,17 @@
             (cdr (assoc :expected-tab-setting args))))
       (cond
        ((eq expected-tab-setting 'hard)
-        (assert (eq change-indent-tabs-mode t))
-        (assert (eq indent-tabs-mode-setting t)))
+        (cl-assert (eq change-indent-tabs-mode t))
+        (cl-assert (eq indent-tabs-mode-setting t)))
        ((eq expected-tab-setting 'soft)
-        (assert (eq change-indent-tabs-mode t))
-        (assert (eq indent-tabs-mode-setting nil)))
+        (cl-assert (eq change-indent-tabs-mode t))
+        (cl-assert (eq indent-tabs-mode-setting nil)))
        ((eq expected-tab-setting 'undecided)
-        (assert (eq change-indent-tabs-mode nil))))
+        (cl-assert (eq change-indent-tabs-mode nil))))
       (if expected-offset
-          (assert (eq nil rejected) t)
-        (assert (not (eq nil rejected)) t))
-      (assert (eq expected-offset
+          (cl-assert (eq nil rejected) t)
+        (cl-assert (not (eq nil rejected)) t))
+      (cl-assert (eq expected-offset
                   best-indent-offset) t))))
 
 (defun dtrt-indent-test-rec-directory-files
