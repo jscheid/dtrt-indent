@@ -176,6 +176,12 @@ aa /*foo
    (:expected-tab-setting . soft)
    (:expected-offset . 8)))
 
+(dtrt-indent-functional-test
+ '((:buffer-contents . "")
+   (:mode . c-mode)
+   (:expected-tab-setting . undecided)
+   (:expected-offset . nil)))
+
 (when nil ;; disabled
   (with-output-to-temp-buffer "*dtrt-indent-test-results*"
     (dtrt-indent-bulk-test
