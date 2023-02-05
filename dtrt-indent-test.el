@@ -32,8 +32,6 @@
   (with-temp-buffer
     (make-local-variable 'dtrt-indent-verbosity)
     (setq dtrt-indent-verbosity 0)
-    (make-local-variable 'dtrt-indent-min-relevant-lines)
-    (setq dtrt-indent-min-relevant-lines 3)
     (insert (cdr (assoc :buffer-contents args)))
     (let* ((language-and-variable
             (cdr (dtrt-indent--search-hook-mapping
@@ -180,6 +178,16 @@ aa /*foo
  '((:buffer-contents . "")
    (:mode . c-mode)
    (:expected-tab-setting . undecided)
+   (:expected-offset . nil)))
+
+(dtrt-indent-functional-test
+ '((:buffer-contents . "\
+(let ((foo 1)
+      (bar
+       2))
+  (message \"%d %d\" foo bar))")
+   (:mode . emacs-lisp-mode)
+   (:expected-tab-setting . soft)
    (:expected-offset . nil)))
 
 (when nil ;; disabled
