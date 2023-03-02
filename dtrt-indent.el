@@ -1,11 +1,11 @@
 ;;; dtrt-indent.el --- Adapt to foreign indentation offsets
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
-;; Copyright (C) 2014-2022 Reuben Thomas
+;; Copyright (C) 2014-2023 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Maintainer: Reuben Thomas <rrt@sc3d.org>
-;; Version: 1.8
+;; Version: 1.9
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
