@@ -74,7 +74,7 @@
                        best-indent-offset) t)))))
 
 (defun dtrt-indent-test-rec-directory-files
-  (directory filename-pattern function)
+    (directory filename-pattern function)
   (let ((files
          (directory-files directory t)))
     (mapc (lambda (file)
