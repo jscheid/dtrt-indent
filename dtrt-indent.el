@@ -358,6 +358,8 @@ quote, for example.")
     (cmake-mode      cmake         cmake-tab-width)       ; CMake
     (xquery-mode     sgml          xquery-mode-indent-width) ; XQuery
     (vhdl-mode       default       vhdl-basic-offset) ; VHDL
+    (groovy-mode     c/c++/java    (groovy-indent-offset
+                                    tab-width))          ; Groovy
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
