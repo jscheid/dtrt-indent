@@ -360,6 +360,8 @@ quote, for example.")
     (vhdl-mode       default       vhdl-basic-offset) ; VHDL
     (groovy-mode     c/c++/java    (groovy-indent-offset
                                     tab-width))          ; Groovy
+    (yaml-mode       default       (yaml-indent-offset
+                                    tab-width))          ; YAML
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
