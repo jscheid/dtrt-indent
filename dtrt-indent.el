@@ -363,6 +363,10 @@ quote, for example.")
     (yaml-mode       default       (yaml-indent-offset
                                     tab-width))          ; YAML
 
+    ;; modes with treesitter enabled
+    (c-ts-mode       c/c++/java    c-ts-mode-indent-offset)
+    (c++-ts-mode     c/c++/java    c-ts-mode-indent-offset)
+
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
     (ruby-mode       ruby          ruby-indent-level)    ; Ruby
