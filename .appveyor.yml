@@ -1,6 +1,4 @@
 image:
-  - Ubuntu1604
-  - Ubuntu1804
   - Ubuntu2004
 
 version: "{build}"
