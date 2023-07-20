@@ -362,6 +362,7 @@ quote, for example.")
                                     tab-width))          ; Groovy
     (yaml-mode       default       (yaml-indent-offset
                                     tab-width))          ; YAML
+    (swift-mode       c/c++/java   swift-mode:basic-offset) ; Swift
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
