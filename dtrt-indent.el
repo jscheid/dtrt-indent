@@ -362,7 +362,7 @@ quote, for example.")
                                     tab-width))          ; Groovy
     (yaml-mode       default       (yaml-indent-offset
                                     tab-width))          ; YAML
-    (swift-mode       c/c++/java   swift-mode:basic-offset) ; Swift
+    (swift-mode      c/c++/java   swift-mode:basic-offset) ; Swift
 
     ;; Modes that use SMIE if available
     (sh-mode         default       sh-basic-offset)      ; Shell Script
@@ -383,6 +383,7 @@ quote, for example.")
     (rust-ts-mode    c/c++/java    rust-ts-mode-indent-offset)
     (json-ts-mode    javascript    json-ts-mode-indent-offset)
     (cmake-ts-mode   cmake         cmake-ts-mode-indent-offset)
+    (typescript-ts-mode typescript typescript-ts-mode-indent-offset)
 
     (default         default       standard-indent))     ; default fallback
   "A mapping from hook variables to language types.")
