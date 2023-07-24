@@ -326,65 +326,66 @@ prevent an escaped quote from being interpreted as the closing
 quote, for example.")
 
 (defvar dtrt-indent-hook-mapping-list
-  ;; Mode            Syntax        Variable
-  '((c-mode          c/c++/java    c-basic-offset)       ; C
-    (c++-mode        c/c++/java    c-basic-offset)       ; C++
-    (d-mode          c/c++/java    c-basic-offset)       ; D
-    (java-mode       c/c++/java    c-basic-offset)       ; Java
-    (jde-mode        c/c++/java    c-basic-offset)       ; Java (JDE)
-    (js-mode         javascript    js-indent-level)      ; JavaScript
-    (js2-mode        javascript    js2-basic-offset)     ; JavaScript-IDE
-    (js3-mode        javascript    js3-indent-level)     ; JavaScript-IDE
-    (json-mode       javascript    js-indent-level)      ; JSON
-    (lua-mode        lua           lua-indent-level)     ; Lua
-    (objc-mode       c/c++/java    c-basic-offset)       ; Objective C
-    (php-mode        c/c++/java    c-basic-offset)       ; PHP
-    (perl-mode       perl          perl-indent-level)    ; Perl
-    (cperl-mode      perl          cperl-indent-level)   ; Perl
-    (raku-mode       perl          raku-indent-offset)   ; Perl6/Raku
-    (erlang-mode     erlang        erlang-indent-level)  ; Erlang
-    (ada-mode        ada           ada-indent)           ; Ada
-    (sgml-mode       sgml          sgml-basic-offset)    ; SGML
-    (nxml-mode       sgml          nxml-child-indent)    ; XML
-    (web-mode        sgml          (web-mode-markup-indent-offset
-                                    web-mode-code-indent-offset
-                                    web-mode-sql-indent-offset
-                                    web-mode-css-indent-offset)) ; HTML
-    (pascal-mode     pascal        pascal-indent-level)  ; Pascal
-    (typescript-mode javascript    typescript-indent-level) ; Typescript
-    (protobuf-mode   c/c++/java    c-basic-offset)       ; Protobuf
-    (plantuml-mode   default       plantuml-indent-level) ; PlantUML
-    (pug-mode        default       pug-tab-width)         ; Pug
-    (cmake-mode      cmake         cmake-tab-width)       ; CMake
-    (xquery-mode     sgml          xquery-mode-indent-width) ; XQuery
-    (vhdl-mode       default       vhdl-basic-offset) ; VHDL
-    (groovy-mode     c/c++/java    (groovy-indent-offset
-                                    tab-width))          ; Groovy
-    (yaml-mode       default       (yaml-indent-offset
-                                    tab-width))          ; YAML
-    (swift-mode       c/c++/java   swift-mode:basic-offset) ; Swift
+  ;; Mode               Syntax        Variable
+  '((c-mode             c/c++/java    c-basic-offset)       ; C
+    (c++-mode           c/c++/java    c-basic-offset)       ; C++
+    (d-mode             c/c++/java    c-basic-offset)       ; D
+    (java-mode          c/c++/java    c-basic-offset)       ; Java
+    (jde-mode           c/c++/java    c-basic-offset)       ; Java (JDE)
+    (js-mode            javascript    js-indent-level)      ; JavaScript
+    (js2-mode           javascript    js2-basic-offset)     ; JavaScript-IDE
+    (js3-mode           javascript    js3-indent-level)     ; JavaScript-IDE
+    (json-mode          javascript    js-indent-level)      ; JSON
+    (lua-mode           lua           lua-indent-level)     ; Lua
+    (objc-mode          c/c++/java    c-basic-offset)       ; Objective C
+    (php-mode           c/c++/java    c-basic-offset)       ; PHP
+    (perl-mode          perl          perl-indent-level)    ; Perl
+    (cperl-mode         perl          cperl-indent-level)   ; Perl
+    (raku-mode          perl          raku-indent-offset)   ; Perl6/Raku
+    (erlang-mode        erlang        erlang-indent-level)  ; Erlang
+    (ada-mode           ada           ada-indent)           ; Ada
+    (sgml-mode          sgml          sgml-basic-offset)    ; SGML
+    (nxml-mode          sgml          nxml-child-indent)    ; XML
+    (web-mode           sgml          (web-mode-markup-indent-offset
+                                       web-mode-code-indent-offset
+                                       web-mode-sql-indent-offset
+                                       web-mode-css-indent-offset)) ; HTML
+    (pascal-mode        pascal        pascal-indent-level)  ; Pascal
+    (typescript-mode    javascript    typescript-indent-level) ; Typescript
+    (protobuf-mode      c/c++/java    c-basic-offset)       ; Protobuf
+    (plantuml-mode      default       plantuml-indent-level) ; PlantUML
+    (pug-mode           default       pug-tab-width)         ; Pug
+    (cmake-mode         cmake         cmake-tab-width)       ; CMake
+    (xquery-mode        sgml          xquery-mode-indent-width) ; XQuery
+    (vhdl-mode          default       vhdl-basic-offset) ; VHDL
+    (groovy-mode        c/c++/java    (groovy-indent-offset
+                                       tab-width))          ; Groovy
+    (yaml-mode          default       (yaml-indent-offset
+                                       tab-width))          ; YAML
+    (swift-mode         c/c++/java   swift-mode:basic-offset) ; Swift
 
     ;; Modes that use SMIE if available
-    (sh-mode         default       sh-basic-offset)      ; Shell Script
-    (ruby-mode       ruby          ruby-indent-level)    ; Ruby
-    (enh-ruby-mode   ruby          enh-ruby-indent-level); Ruby
-    (crystal-mode    ruby          crystal-indent-level) ; Crystal (Ruby)
-    (css-mode        css           css-indent-offset)    ; CSS
-    (rust-mode       c/c++/java    rust-indent-offset)   ; Rust
-    (rustic-mode     c/c++/java    rustic-indent-offset) ; Rust
-    (scala-mode      c/c++/java    scala-indent:step)    ; Scala
+    (sh-mode            default       sh-basic-offset)      ; Shell Script
+    (ruby-mode          ruby          ruby-indent-level)    ; Ruby
+    (enh-ruby-mode      ruby          enh-ruby-indent-level); Ruby
+    (crystal-mode       ruby          crystal-indent-level) ; Crystal (Ruby)
+    (css-mode           css           css-indent-offset)    ; CSS
+    (rust-mode          c/c++/java    rust-indent-offset)   ; Rust
+    (rustic-mode        c/c++/java    rustic-indent-offset) ; Rust
+    (scala-mode         c/c++/java    scala-indent:step)    ; Scala
 
     ;; modes with treesitter enabled
-    (c-ts-mode       c/c++/java    c-ts-mode-indent-offset)
-    (c++-ts-mode     c/c++/java    c-ts-mode-indent-offset)
-    (go-ts-mode      c/c++/java    go-ts-mode-indent-offset)
-    (gpr-ts-mode     ada           gpr-ts-mode-indent-offset)
-    (java-ts-mode    c/c++/java    java-ts-mode-indent-offset)
-    (rust-ts-mode    c/c++/java    rust-ts-mode-indent-offset)
-    (json-ts-mode    javascript    json-ts-mode-indent-offset)
-    (cmake-ts-mode   cmake         cmake-ts-mode-indent-offset)
+    (c-ts-mode          c/c++/java    c-ts-mode-indent-offset)
+    (c++-ts-mode        c/c++/java    c-ts-mode-indent-offset)
+    (go-ts-mode         c/c++/java    go-ts-mode-indent-offset)
+    (gpr-ts-mode        ada           gpr-ts-mode-indent-offset)
+    (java-ts-mode       c/c++/java    java-ts-mode-indent-offset)
+    (rust-ts-mode       c/c++/java    rust-ts-mode-indent-offset)
+    (json-ts-mode       javascript    json-ts-mode-indent-offset)
+    (cmake-ts-mode      cmake         cmake-ts-mode-indent-offset)
+    (typescript-ts-mode typescript    typescript-ts-mode-indent-offset)
 
-    (default         default       standard-indent))     ; default fallback
+    (default            default       standard-indent))     ; default fallback
   "A mapping from hook variables to language types.")
 
 ;;-----------------------------------------------------------------
