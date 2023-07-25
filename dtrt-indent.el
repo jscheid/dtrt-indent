@@ -385,7 +385,7 @@ quote, for example.")
     (cmake-ts-mode   cmake         cmake-ts-mode-indent-offset)
     (typescript-ts-mode typescript typescript-ts-mode-indent-offset)
 
-    (default            default       standard-indent))     ; default fallback
+    (default         default       standard-indent))     ; default fallback
   "A mapping from hook variables to language types.")
 
 ;;-----------------------------------------------------------------
