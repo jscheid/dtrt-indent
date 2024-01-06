@@ -192,7 +192,7 @@ mode.
 When dtrt-indent mode is enabled, the proper indentation offset
 and `indent-tabs-mode' will be guessed for newly opened files and
 adjusted transparently."
-  :lighter " dtrt-indent"
+  :lighter dtrt-indent-lighter
   :group 'dtrt-indent
   (if dtrt-indent-mode
       (if (and (featurep 'smie) (not (null smie-grammar)) (not (eq smie-grammar 'unset)))
@@ -409,6 +409,12 @@ use either \\[customize] or the function `dtrt-indent-mode'."
   :type    'boolean
   :group   'dtrt-indent
   :require 'dtrt-indent)
+
+(defcustom dtrt-indent-lighter " dtrt-indent"
+  "Mode line lighter for the dtrt-indent minor mode.
+If the value is nil, no lighter is displayed."
+  :type '(choice string
+                 (const :tag "None" nil)))
 
 (defcustom dtrt-indent-verbosity 1
   "*Verbosity level.
