@@ -383,7 +383,7 @@ quote, for example.")
     (rust-ts-mode    c/c++/java    rust-ts-mode-indent-offset)
     (json-ts-mode    javascript    json-ts-mode-indent-offset)
     (cmake-ts-mode   cmake         cmake-ts-mode-indent-offset)
-    (typescript-ts-mode javascript typescript-ts-mode-indent-offset)
+    (typescript-ts-base-mode javascript typescript-ts-mode-indent-offset)
     (ursa-ts-mode    c/c++/java    ursa-ts-mode-indent-offset)
 
     (default         default       standard-indent))     ; default fallback
