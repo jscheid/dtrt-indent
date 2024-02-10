@@ -375,16 +375,16 @@ quote, for example.")
     (scala-mode      c/c++/java    scala-indent:step)    ; Scala
 
     ;; modes with treesitter enabled
-    (c-ts-mode       c/c++/java    c-ts-mode-indent-offset)
-    (c++-ts-mode     c/c++/java    c-ts-mode-indent-offset)
-    (go-ts-mode      c/c++/java    go-ts-mode-indent-offset)
-    (gpr-ts-mode     ada           gpr-ts-mode-indent-offset)
-    (java-ts-mode    c/c++/java    java-ts-mode-indent-offset)
-    (rust-ts-mode    c/c++/java    rust-ts-mode-indent-offset)
-    (json-ts-mode    javascript    json-ts-mode-indent-offset)
-    (cmake-ts-mode   cmake         cmake-ts-mode-indent-offset)
-    (typescript-ts-mode javascript typescript-ts-mode-indent-offset)
-    (ursa-ts-mode    c/c++/java    ursa-ts-mode-indent-offset)
+    (c-ts-mode               c/c++/java c-ts-mode-indent-offset)
+    (c++-ts-mode             c/c++/java c-ts-mode-indent-offset)
+    (go-ts-mode              c/c++/java go-ts-mode-indent-offset)
+    (gpr-ts-mode             ada        gpr-ts-mode-indent-offset)
+    (java-ts-mode            c/c++/java java-ts-mode-indent-offset)
+    (rust-ts-mode            c/c++/java rust-ts-mode-indent-offset)
+    (json-ts-mode            javascript json-ts-mode-indent-offset)
+    (cmake-ts-mode           cmake      cmake-ts-mode-indent-offset)
+    (typescript-base-ts-mode javascript typescript-ts-mode-indent-offset)
+    (ursa-ts-mode            c/c++/java ursa-ts-mode-indent-offset)
 
     (default         default       standard-indent))     ; default fallback
   "A mapping from hook variables to language types.")
