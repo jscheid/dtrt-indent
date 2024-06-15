@@ -1040,6 +1040,35 @@ Indentation offset set with file variable; not adjusted")
           nil))
         ))))
 
+(defun dtrt-indent-set (indent)
+  "Force the indentation offset for the current buffer to INDENT."
+  (interactive "nIndentation offset: ")
+  (let ((language-and-variable (cdr (dtrt-indent--search-hook-mapping major-mode))))
+    (when language-and-variable
+      (let* ((indent-offset-mode-variables
+              (let ((v (nth 1 language-and-variable)))
+                (if (listp v) v (list v))))
+             (indent-offset-variables
+              (append
+               indent-offset-mode-variables
+               (remove nil
+                       (mapcar
+                        (lambda (x)
+                          (let ((mode (car x))
+                                (variable (cadr x)))
+                            (when (and (boundp mode)
+                                       (symbol-value mode))
+                              variable)))
+                        dtrt-indent-hook-generic-mapping-list)))))
+        (setq dtrt-indent-original-indent
+              (mapcar
+               (lambda (x)
+                 (list x (symbol-value x) (local-variable-p x)))
+               indent-offset-variables))
+        (dolist (x indent-offset-variables)
+          (set (make-local-variable x)
+               indent))))))
+
 (defun dtrt-indent-adapt ()
   "Try adjusting indentation settings for the current buffer."
   (interactive)
