@@ -1045,6 +1045,8 @@ Indentation offset set with file variable; not adjusted")
   (interactive "nIndentation offset: ")
   (let ((language-and-variable (cdr (dtrt-indent--search-hook-mapping major-mode))))
     (when language-and-variable
+      (when (string= (car language-and-variable) "default")
+        (error "Unsupported mode: %s" major-mode))
       (let* ((indent-offset-mode-variables
               (let ((v (nth 1 language-and-variable)))
                 (if (listp v) v (list v))))
@@ -1067,7 +1069,11 @@ Indentation offset set with file variable; not adjusted")
                indent-offset-variables))
         (dolist (x indent-offset-variables)
           (set (make-local-variable x)
-               indent))))))
+               indent))
+        (when (>= dtrt-indent-verbosity 1)
+          (message "%s set to %d"
+                   (mapconcat 'symbol-name indent-offset-variables ", ")
+                   indent))))))
 
 (defun dtrt-indent-adapt ()
   "Try adjusting indentation settings for the current buffer."
