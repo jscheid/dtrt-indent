@@ -5,7 +5,7 @@
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Maintainer: Reuben Thomas <rrt@sc3d.org>
-;; Version: 1.17
+;; Version: 1.18
 ;; Keywords: convenience files languages c
 
 ;; This file is free software; you can redistribute it and/or modify
