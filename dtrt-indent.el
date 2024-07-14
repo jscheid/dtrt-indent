@@ -376,6 +376,7 @@ quote, for example.")
     (scala-mode      c/c++/java    scala-indent:step)    ; Scala
 
     ;; modes with treesitter enabled
+    (ada-ts-mode     ada           ada-ts-mode-indent-offset)
     (c-ts-mode       c/c++/java    c-ts-mode-indent-offset)
     (c++-ts-mode     c/c++/java    c-ts-mode-indent-offset)
     (go-ts-mode      c/c++/java    go-ts-mode-indent-offset)
