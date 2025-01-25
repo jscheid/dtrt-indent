@@ -937,6 +937,7 @@ merged with offset %s (%.2f%% deviation, limit %.2f%%)"
 
 (defun dtrt-indent-try-set-offset ()
   "Try adjusting the current buffer's indentation offset."
+  (interactive)
   (let ((language-and-variable (cdr (dtrt-indent--search-hook-mapping major-mode))))
     (when language-and-variable
       (let* ((result
