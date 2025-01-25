@@ -443,7 +443,7 @@ keeps dtrt-indent of ever outputting anything."
 Whether dtrt-indent asks for confirmation whenever it is about to
 make any adjustments.  By default, adjustments are made without
 your explicit consent because dtrt-indent is already quite
-conservative and tries to 'do the right thing', adjustments can
+conservative and tries to `do the right thing', adjustments can
 be undone easily, and they aren't harmful in the first place.
 However, if you feel like it's doing things behind your back
 you should enable this setting."
@@ -595,7 +595,7 @@ an offset divisible by 4.
 The default value of 1 effectively disables any such requirement.
 If you are getting false positives, you might want to set this to
 a higher value such as 2.  However, a value of 2 means that the
-offset won't be guessed for files containing only 'flat'
+offset won't be guessed for files containing only `flat'
 constructs"
   :type 'integer
   :tag "Minimum Depth"
