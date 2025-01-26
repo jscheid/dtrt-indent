@@ -204,14 +204,16 @@ adjusted transparently."
     (dtrt-indent-undo)))
 
 ;;;###autoload
-(define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode
-  (lambda ()
+(define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode dtrt-indent--mode
+  :group 'dtrt-indent)
+
+;;;###autoload
+(defun dtrt-indent--mode ()
     ;; javascript-mode is an alias for js-mode, so derived-mode-p does not
     ;; detect it is derived from 'prog-mode (Emacs bug #46331: remove once
     ;; Emacs >= 28.1 can be assumed)
     (when (derived-mode-p 'prog-mode 'text-mode 'javascript-mode)
       (dtrt-indent-mode)))
-    :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
