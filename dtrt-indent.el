@@ -195,7 +195,7 @@ adjusted transparently."
   :lighter dtrt-indent-lighter
   :group 'dtrt-indent
   (if dtrt-indent-mode
-      (if (and (featurep 'smie) (not (null smie-grammar)) (not (eq smie-grammar 'unset)))
+      (if (and (boundp 'smie-grammar) (not (null smie-grammar)) (not (eq smie-grammar 'unset)))
           (progn
             (when (null smie-config--buffer-local) (smie-config-guess))
             (when dtrt-indent-run-after-smie
