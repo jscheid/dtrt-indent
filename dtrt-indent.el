@@ -6,7 +6,7 @@
 ;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Maintainer: Reuben Thomas <rrt@sc3d.org>
 ;; URL: https://github.com/jscheid/dtrt-indent
-;; Version: 1.22
+;; Version: 1.23
 ;; Keywords: convenience files languages c
 ;; Package-Requires: ((emacs "24.4"))
 
