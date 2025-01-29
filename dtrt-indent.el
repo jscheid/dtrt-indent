@@ -1,12 +1,14 @@
-;;; dtrt-indent.el --- Adapt to foreign indentation offsets
+;;; dtrt-indent.el --- Adapt to foreign indentation offsets -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2003, 2007, 2008 Julian Scheid
 ;; Copyright (C) 2014-2025 Reuben Thomas
 
 ;; Author: Julian Scheid <julians37@googlemail.com>
 ;; Maintainer: Reuben Thomas <rrt@sc3d.org>
+;; URL: https://github.com/jscheid/dtrt-indent
 ;; Version: 1.21
 ;; Keywords: convenience files languages c
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -199,7 +201,7 @@ adjusted transparently."
           (progn
             ;; FIXME: Emacs warns about unbound identifiers: https://github.com/jscheid/dtrt-indent/issues/79
             (when (null smie-config--buffer-local) (smie-config-guess))
-            (when dtrt-indent-run-after-smie
+            (when (bound-and-true-p dtrt-indent-run-after-smie)
               (dtrt-indent-try-set-offset)))
         (dtrt-indent-try-set-offset))
     (dtrt-indent-undo)))
@@ -208,13 +210,13 @@ adjusted transparently."
 (define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode dtrt-indent--mode
   :group 'dtrt-indent)
 
-;;;###autoload
 (defun dtrt-indent--mode ()
-    ;; javascript-mode is an alias for js-mode, so derived-mode-p does not
-    ;; detect it is derived from 'prog-mode (Emacs bug #46331: remove once
-    ;; Emacs >= 28.1 can be assumed)
-    (when (derived-mode-p 'prog-mode 'text-mode 'javascript-mode)
-      (dtrt-indent-mode)))
+  "Enable `dtrt-indent-mode'."
+  ;; javascript-mode is an alias for js-mode, so derived-mode-p does not
+  ;; detect it is derived from 'prog-mode (Emacs bug #46331: remove once
+  ;; Emacs >= 28.1 can be assumed)
+  (when (derived-mode-p 'prog-mode 'text-mode 'javascript-mode)
+    (dtrt-indent-mode)))
 
 (defvar dtrt-indent-language-syntax-table
   '((c/c++/java ("\""                    0   "\""       nil "\\\\.")
@@ -283,14 +285,14 @@ adjusted transparently."
                 ("\\["                   0   "\\]"      t)
                 ("("                     0   ")"        t)
                 ("\\_<\\(?:begin\\|case\\|fun\\|if\\|receive\\|try\\)\\_>"
-                                         0   "\\_<end\\_>" t))
+                 0   "\\_<end\\_>" t))
 
     (css        ("\""                    0   "\""       nil "\\\\.")
                 ("'"                     0   "'"        nil "\\\\.")
                 ("/\\*"                  0   "\\*/"   nil))
 
     (sgml       ("[<]!\\[(CDATA|IGNORE|RCDATA)\\["
-                                         0   "\\]\\][>]"     nil)
+                 0   "\\]\\][>]"     nil)
                 ("[<]!--"                0   "[^-]--[>]"  nil))
 
     (cmake      ("\""                    0   "\""        nil "\\\\.")
@@ -316,7 +318,7 @@ groups there are in BEGIN-REGEXP to be substituted in END-REGEXP.
 
 END-REGEXP is a regular expression matching the end of the syntax
 construct in question.  It can refer back to one group in
-BEGIN-REGEXP using \1. Currently only one group is supported (\2
+BEGIN-REGEXP using \\1. Currently only one group is supported (\\2
 cannot be used.)
 
 RECURSIVE-P indicates whether other syntax constructs can be
@@ -459,9 +461,10 @@ you should enable this setting."
   '((evil-mode       evil-shift-width))  ; evil
   "A mapping from hook variables to indentation variables.
 For each true key variable, its value variable is set to the same
-indentation offset as the variable in `dtrt-indent-hook-mapping-list'
-(e.g., `c-basic-offset').  Every pair in the list is processed.  To
-disable processing of any one pair, remove the pair from the list.
+indentation offset as the variable in
+`dtrt-indent-hook-mapping-list' (e.g., `c-basic-offset').
+Every pair in the list is processed.  To disable processing of any
+one pair, remove the pair from the list.
 Processing the list obeys `dtrt-indent-require-confirmation-flag'.
 
 The key can be any variable.  This list is used for cases such as when
@@ -710,8 +713,8 @@ constrains the search to the current line."
                     (dtrt-indent--replace-in-string
                      (nth 2 matching-syntax-entry)
                      "[\\][1]" (regexp-quote
-				(match-string-no-properties
-				 (1+ match-index))))
+				                        (match-string-no-properties
+				                         (1+ match-index))))
                   (nth 2 matching-syntax-entry))
                 (nth 4 matching-syntax-entry)
                 (when (nth 3 matching-syntax-entry) syntax-regex-pairs)
@@ -1043,8 +1046,7 @@ Indentation offset set with file variable; not adjusted")
          (t
           (when (>= dtrt-indent-verbosity 2)
             (message "Note: indent-tabs-mode not adjusted"))
-          nil))
-        ))))
+          nil))))))
 
 (defun dtrt-indent-set (indent)
   "Force the indentation offset for the current buffer to INDENT."
@@ -1120,18 +1122,16 @@ Indentation offset set with file variable; not adjusted")
 ;;-----------------------------------------------------------------
 ;; Installation
 
-(defadvice hack-one-local-variable
-    (before dtrt-indent-advise-hack-one-local-variable activate)
-  "Adviced by dtrt-indent.
-
-Disable dtrt-indent if offset explicitly set."
+(defun dtrt-indent-advise-hack-one-local-variable (var _val &rest _)
+  "Advice for `hack-one-local-variable' to disable dtrt-indent when necessary.
+VAR corresponds to the first argument of `hack-one-local-variable'."
   (cond
-   ((eql (nth 2 (dtrt-indent--search-hook-mapping major-mode))
-         (ad-get-arg 0))
+   ((eql (nth 2 (dtrt-indent--search-hook-mapping major-mode)) var)
     (setq dtrt-indent-explicit-offset t))
-   ((eql 'indent-tabs-mode
-         (ad-get-arg 0))
+   ((eql 'indent-tabs-mode var)
     (setq dtrt-indent-explicit-tab-mode t))))
+
+(advice-add 'hack-one-local-variable :before #'dtrt-indent-advise-hack-one-local-variable)
 
 (autoload 'dtrt-indent-diagnosis "dtrt-indent-diag"
   "Guess indentation for the current buffer and output diagnostics."
