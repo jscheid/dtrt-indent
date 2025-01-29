@@ -199,7 +199,7 @@ adjusted transparently."
   (if dtrt-indent-mode
       (if (and (boundp 'smie-grammar) (not (null smie-grammar)) (not (eq smie-grammar 'unset)))
           (progn
-            (when (and (null smie-config--buffer-local)
+            (when (and (not (bound-and-true-p smie-config--buffer-local))
                        (fboundp 'smie-config-guess))
               (smie-config-guess))
             (when (bound-and-true-p dtrt-indent-run-after-smie)
