@@ -199,8 +199,9 @@ adjusted transparently."
   (if dtrt-indent-mode
       (if (and (boundp 'smie-grammar) (not (null smie-grammar)) (not (eq smie-grammar 'unset)))
           (progn
-            ;; FIXME: Emacs warns about unbound identifiers: https://github.com/jscheid/dtrt-indent/issues/79
-            (when (null smie-config--buffer-local) (smie-config-guess))
+            (when (and (null smie-config--buffer-local)
+                       (fboundp 'smie-config-guess))
+              (smie-config-guess))
             (when (bound-and-true-p dtrt-indent-run-after-smie)
               (dtrt-indent-try-set-offset)))
         (dtrt-indent-try-set-offset))
