@@ -210,7 +210,7 @@ adjusted transparently."
 ;;;###autoload
 (define-globalized-minor-mode dtrt-indent-global-mode dtrt-indent-mode
   (lambda () (dtrt-indent-mode 1))
-  :predicate t '(prog-mode text-mode)
+  :predicate '(prog-mode text-mode)
   :group 'dtrt-indent)
 
 (defvar dtrt-indent-language-syntax-table
